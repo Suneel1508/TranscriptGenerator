@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { GraduationCap, FileText, Settings, LogOut, Home, History } from 'lucide-react'
+import { GraduationCap, FileText, Settings, LogOut, Home, History, Users } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 const Header = () => {
@@ -73,6 +73,18 @@ const Header = () => {
                 >
                   <History className="h-4 w-4" />
                   <span>History</span>
+                </Link>
+                
+                <Link
+                  to="/students"
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive('/students') 
+                      ? 'text-primary-600 bg-primary-50' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  <Users className="h-4 w-4" />
+                  <span>Students</span>
                 </Link>
                 
                 <button

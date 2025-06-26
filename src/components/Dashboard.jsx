@@ -6,6 +6,13 @@ import { useTranscript } from '../context/TranscriptContext'
 const Dashboard = () => {
   const { savedTranscripts } = useTranscript()
 
+  // Calculate unique students based on SSN
+  const uniqueStudents = new Set()
+  savedTranscripts.forEach(transcript => {
+    const ssn = transcript.data.ssn || 'unknown'
+    uniqueStudents.add(ssn)
+  })
+
   const stats = [
     {
       name: 'Total Transcripts',
@@ -25,7 +32,7 @@ const Dashboard = () => {
     },
     {
       name: 'Students',
-      value: new Set(savedTranscripts.map(t => t.data.studentName)).size,
+      value: uniqueStudents.size,
       icon: Users,
       color: 'bg-purple-500'
     }
@@ -58,7 +65,7 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Link to="/create" className="card p-8 hover:shadow-lg transition-shadow group">
           <div className="flex items-center justify-center mb-4">
             <div className="bg-primary-600 p-4 rounded-full group-hover:bg-primary-700 transition-colors">
@@ -84,6 +91,20 @@ const Dashboard = () => {
           </h3>
           <p className="text-gray-600 text-center">
             Browse, search, and manage all previously created transcripts with advanced filtering options.
+          </p>
+        </Link>
+
+        <Link to="/students" className="card p-8 hover:shadow-lg transition-shadow group">
+          <div className="flex items-center justify-center mb-4">
+            <div className="bg-purple-600 p-4 rounded-full group-hover:bg-purple-700 transition-colors">
+              <Users className="h-8 w-8 text-white" />
+            </div>
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
+            Manage Students
+          </h3>
+          <p className="text-gray-600 text-center">
+            View all students and their transcript records organized by student profiles.
           </p>
         </Link>
       </div>

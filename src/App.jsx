@@ -4,6 +4,7 @@ import Header from './components/Header'
 import Home from './pages/Home'
 import TranscriptForm from './pages/TranscriptForm'
 import PastTranscripts from './pages/PastTranscripts'
+import Students from './pages/Students'
 import Dashboard from './components/Dashboard'
 import LoginForm from './components/LoginForm'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -42,6 +43,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <PastTranscripts />
+                    </ProtectedRoute>
+                  } 
+                />
+                <Route 
+                  path="/students" 
+                  element={
+                    <ProtectedRoute>
+                      <Students />
                     </ProtectedRoute>
                   } 
                 />

@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 import { Lock, User, Eye, EyeOff } from 'lucide-react'
 
 const LoginForm = () => {
   const { login } = useAuth()
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -19,7 +21,10 @@ const LoginForm = () => {
 
     const result = login(formData.username, formData.password)
     
-    if (!result.success) {
+    if (result.success) {
+      // Redirect to home page on successful login
+      navigate('/')
+    } else {
       setError(result.error)
     }
     
