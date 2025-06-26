@@ -7,22 +7,26 @@ const CoursesForm = () => {
   const [isAdding, setIsAdding] = useState(false)
   const [editingCourse, setEditingCourse] = useState(null)
   const [courseForm, setCourseForm] = useState({
-    courseCode: '',
-    courseName: '',
-    credits: '',
+    gradeLevel: '',
+    schoolYear: '',
+    courseTitle: '',
+    hap: '',
     grade: '',
-    semester: '',
-    year: ''
+    credits: '',
+    school: '',
+    semester: '1st'
   })
 
   const resetForm = () => {
     setCourseForm({
-      courseCode: '',
-      courseName: '',
-      credits: '',
+      gradeLevel: '',
+      schoolYear: '',
+      courseTitle: '',
+      hap: '',
       grade: '',
-      semester: '',
-      year: ''
+      credits: '',
+      school: '',
+      semester: '1st'
     })
     setIsAdding(false)
     setEditingCourse(null)
@@ -50,8 +54,14 @@ const CoursesForm = () => {
     }, 0)
   }
 
-  const gradeOptions = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'F', 'P', 'NP', 'W', 'I']
-  const semesterOptions = ['Fall', 'Spring', 'Summer', 'Winter']
+  const gradeOptions = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'F', 'P', 'IP', 'S', 'H']
+  const hapOptions = ['AP', 'H', 'CL', '']
+  const schoolOptions = [
+    'Legend College Preparatory',
+    'Leigh High School',
+    'Foothill College',
+    'De Anza College'
+  ]
 
   return (
     <div className="space-y-6">
@@ -73,47 +83,77 @@ const CoursesForm = () => {
             {editingCourse ? 'Edit Course' : 'Add New Course'}
           </h4>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Course Code *
+                  Grade Level *
+                </label>
+                <select
+                  value={courseForm.gradeLevel}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, gradeLevel: e.target.value }))}
+                  className="input-field"
+                  required
+                >
+                  <option value="">Select Grade</option>
+                  {[9, 10, 11, 12].map(grade => (
+                    <option key={grade} value={grade}>{grade}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  School Year *
                 </label>
                 <input
                   type="text"
-                  value={courseForm.courseCode}
-                  onChange={(e) => setCourseForm(prev => ({ ...prev, courseCode: e.target.value }))}
+                  value={courseForm.schoolYear}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, schoolYear: e.target.value }))}
                   className="input-field"
-                  placeholder="e.g., CS101"
+                  placeholder="e.g., '16-17"
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Course Name *
+                  Semester *
+                </label>
+                <select
+                  value={courseForm.semester}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, semester: e.target.value }))}
+                  className="input-field"
+                  required
+                >
+                  <option value="1st">1st Semester</option>
+                  <option value="2nd">2nd Semester</option>
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Course Title *
                 </label>
                 <input
                   type="text"
-                  value={courseForm.courseName}
-                  onChange={(e) => setCourseForm(prev => ({ ...prev, courseName: e.target.value }))}
+                  value={courseForm.courseTitle}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, courseTitle: e.target.value }))}
                   className="input-field"
-                  placeholder="e.g., Introduction to Computer Science"
+                  placeholder="e.g., AP Calculus BC"
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Credits *
+                  H/AP
                 </label>
-                <input
-                  type="number"
-                  step="0.5"
-                  min="0"
-                  value={courseForm.credits}
-                  onChange={(e) => setCourseForm(prev => ({ ...prev, credits: e.target.value }))}
+                <select
+                  value={courseForm.hap}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, hap: e.target.value }))}
                   className="input-field"
-                  placeholder="e.g., 3"
-                  required
-                />
+                >
+                  <option value="">None</option>
+                  {hapOptions.filter(h => h).map(hap => (
+                    <option key={hap} value={hap}>{hap}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -133,34 +173,34 @@ const CoursesForm = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Semester *
-                </label>
-                <select
-                  value={courseForm.semester}
-                  onChange={(e) => setCourseForm(prev => ({ ...prev, semester: e.target.value }))}
-                  className="input-field"
-                  required
-                >
-                  <option value="">Select Semester</option>
-                  {semesterOptions.map(semester => (
-                    <option key={semester} value={semester}>{semester}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Year *
+                  Credits *
                 </label>
                 <input
                   type="number"
-                  min="1900"
-                  max="2100"
-                  value={courseForm.year}
-                  onChange={(e) => setCourseForm(prev => ({ ...prev, year: e.target.value }))}
+                  step="1"
+                  min="0"
+                  value={courseForm.credits}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, credits: e.target.value }))}
                   className="input-field"
-                  placeholder="e.g., 2023"
+                  placeholder="e.g., 5"
                   required
                 />
+              </div>
+              <div className="md:col-span-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  School *
+                </label>
+                <select
+                  value={courseForm.school}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, school: e.target.value }))}
+                  className="input-field"
+                  required
+                >
+                  <option value="">Select School</option>
+                  {schoolOptions.map(school => (
+                    <option key={school} value={school}>{school}</option>
+                  ))}
+                </select>
               </div>
             </div>
             <div className="flex space-x-3">
@@ -183,19 +223,25 @@ const CoursesForm = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Course Code
+                    Grade
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Course Name
+                    Year
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Credits
+                    Course Title
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    H/AP
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Grade
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Term
+                    Credits
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    School
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -206,13 +252,16 @@ const CoursesForm = () => {
                 {transcriptData.courses.map((course) => (
                   <tr key={course.id} className="hover:bg-gray-50">
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {course.courseCode}
-                    </td>
-                    <td className="px-4 py-4 text-sm text-gray-900">
-                      {course.courseName}
+                      {course.gradeLevel}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {course.credits}
+                      {course.schoolYear}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-900">
+                      {course.courseTitle}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {course.hap}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -225,7 +274,10 @@ const CoursesForm = () => {
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {course.semester} {course.year}
+                      {course.credits}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-900">
+                      {course.school}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">

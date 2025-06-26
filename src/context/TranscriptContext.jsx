@@ -12,29 +12,35 @@ export const useTranscript = () => {
 
 export const TranscriptProvider = ({ children }) => {
   const [transcriptData, setTranscriptData] = useState({
+    // Institution Information
+    institutionName: 'LEGEND COLLEGE PREPARATORY TRANSCRIPT',
+    institutionAddress: '21050 McClellan Road, Cupertino CA 95014',
+    institutionPhone: 'Tel: (408)865-0366',
+    institutionEmail: 'transcript@legendcp.com',
+    ceebCode: '054732',
+    
     // Student Information
     studentName: '',
-    studentId: '',
+    studentNumber: '',
+    address: '',
     dateOfBirth: '',
-    program: '',
-    major: '',
-    minor: '',
-    graduationDate: '',
+    gender: '',
+    guardian: '',
+    ssn: '',
     
-    // Institution Information
-    institutionName: 'University of Excellence',
-    institutionAddress: '123 Education Street, Academic City, AC 12345',
-    
-    // Academic Records
-    courses: [],
-    
-    // GPA Information
+    // Academic Information
     cumulativeGPA: '',
     totalCredits: '',
     
-    // Additional Information
-    honors: '',
-    notes: '',
+    // Principal Information
+    principalName: '',
+    dateSigned: '',
+    
+    // Comments
+    comments: 'UNOFFICIAL TRANSCRIPT\nS- College Level\nIP- In Progress\nP- Pass\nF- Fail',
+    
+    // Courses
+    courses: [],
     
     // Files
     photo: null,

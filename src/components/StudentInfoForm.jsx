@@ -12,6 +12,74 @@ const StudentInfoForm = () => {
     <div className="space-y-6">
       <h3 className="text-lg font-semibold text-gray-900">Student Information</h3>
       
+      {/* Institution Header */}
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <h4 className="text-md font-medium text-gray-900 mb-4">Institution Information</h4>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Institution Name
+            </label>
+            <input
+              type="text"
+              value={transcriptData.institutionName}
+              onChange={(e) => handleChange('institutionName', e.target.value)}
+              className="input-field"
+              placeholder="e.g., LEGEND COLLEGE PREPARATORY"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Institution Address
+            </label>
+            <input
+              type="text"
+              value={transcriptData.institutionAddress}
+              onChange={(e) => handleChange('institutionAddress', e.target.value)}
+              className="input-field"
+              placeholder="e.g., 21050 McClellan Road, Cupertino CA 95014"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Phone Number
+            </label>
+            <input
+              type="text"
+              value={transcriptData.institutionPhone}
+              onChange={(e) => handleChange('institutionPhone', e.target.value)}
+              className="input-field"
+              placeholder="e.g., Tel: (408)865-0366"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              value={transcriptData.institutionEmail}
+              onChange={(e) => handleChange('institutionEmail', e.target.value)}
+              className="input-field"
+              placeholder="e.g., transcript@legendcp.com"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              CEEB Code
+            </label>
+            <input
+              type="text"
+              value={transcriptData.ceebCode}
+              onChange={(e) => handleChange('ceebCode', e.target.value)}
+              className="input-field"
+              placeholder="e.g., 054732"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Student Information */}
       <div className="grid md:grid-cols-2 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -22,20 +90,33 @@ const StudentInfoForm = () => {
             value={transcriptData.studentName}
             onChange={(e) => handleChange('studentName', e.target.value)}
             className="input-field"
-            placeholder="Enter full name"
+            placeholder="e.g., Kondor, Anirud"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Student ID *
+            Student Number *
           </label>
           <input
             type="text"
-            value={transcriptData.studentId}
-            onChange={(e) => handleChange('studentId', e.target.value)}
+            value={transcriptData.studentNumber}
+            onChange={(e) => handleChange('studentNumber', e.target.value)}
             className="input-field"
-            placeholder="Enter student ID"
+            placeholder="e.g., 11807"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Address
+          </label>
+          <input
+            type="text"
+            value={transcriptData.address}
+            onChange={(e) => handleChange('address', e.target.value)}
+            className="input-field"
+            placeholder="e.g., 4848 Tilden Dr., San Jose, CA 95124"
           />
         </div>
 
@@ -53,125 +134,124 @@ const StudentInfoForm = () => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Program *
+            Gender
+          </label>
+          <select
+            value={transcriptData.gender}
+            onChange={(e) => handleChange('gender', e.target.value)}
+            className="input-field"
+          >
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Guardian
           </label>
           <input
             type="text"
-            value={transcriptData.program}
-            onChange={(e) => handleChange('program', e.target.value)}
+            value={transcriptData.guardian}
+            onChange={(e) => handleChange('guardian', e.target.value)}
             className="input-field"
-            placeholder="e.g., Bachelor of Science"
+            placeholder="e.g., Padmam Kondor, Sangeetha Kondor"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Major *
+            SSN
           </label>
           <input
             type="text"
-            value={transcriptData.major}
-            onChange={(e) => handleChange('major', e.target.value)}
+            value={transcriptData.ssn}
+            onChange={(e) => handleChange('ssn', e.target.value)}
             className="input-field"
-            placeholder="e.g., Computer Science"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Minor
-          </label>
-          <input
-            type="text"
-            value={transcriptData.minor}
-            onChange={(e) => handleChange('minor', e.target.value)}
-            className="input-field"
-            placeholder="e.g., Mathematics"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Graduation Date
-          </label>
-          <input
-            type="date"
-            value={transcriptData.graduationDate}
-            onChange={(e) => handleChange('graduationDate', e.target.value)}
-            className="input-field"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Cumulative GPA
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            max="4"
-            value={transcriptData.cumulativeGPA}
-            onChange={(e) => handleChange('cumulativeGPA', e.target.value)}
-            className="input-field"
-            placeholder="e.g., 3.75"
+            placeholder="e.g., ********"
           />
         </div>
       </div>
 
-      <div className="space-y-4">
-        <h4 className="text-md font-medium text-gray-900">Institution Information</h4>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Institution Name
-          </label>
-          <input
-            type="text"
-            value={transcriptData.institutionName}
-            onChange={(e) => handleChange('institutionName', e.target.value)}
-            className="input-field"
-            placeholder="University name"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Institution Address
-          </label>
-          <textarea
-            value={transcriptData.institutionAddress}
-            onChange={(e) => handleChange('institutionAddress', e.target.value)}
-            className="input-field"
-            rows="3"
-            placeholder="Full address of the institution"
-          />
+      {/* GPA Summary */}
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <h4 className="text-md font-medium text-gray-900 mb-4">GPA Summary</h4>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Cumulative GPA (Weighted)
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              max="5"
+              value={transcriptData.cumulativeGPA}
+              onChange={(e) => handleChange('cumulativeGPA', e.target.value)}
+              className="input-field"
+              placeholder="e.g., 4.33"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Total Credit Completed
+            </label>
+            <input
+              type="number"
+              step="1"
+              min="0"
+              value={transcriptData.totalCredits}
+              onChange={(e) => handleChange('totalCredits', e.target.value)}
+              className="input-field"
+              placeholder="e.g., 20 Legend College Preparatory"
+            />
+          </div>
         </div>
       </div>
 
+      {/* Principal Information */}
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <h4 className="text-md font-medium text-gray-900 mb-4">Principal Information</h4>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Principal Name
+            </label>
+            <input
+              type="text"
+              value={transcriptData.principalName}
+              onChange={(e) => handleChange('principalName', e.target.value)}
+              className="input-field"
+              placeholder="Principal's Name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Date Signed
+            </label>
+            <input
+              type="date"
+              value={transcriptData.dateSigned}
+              onChange={(e) => handleChange('dateSigned', e.target.value)}
+              className="input-field"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Comments */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Honors & Awards
+          Comments
         </label>
         <textarea
-          value={transcriptData.honors}
-          onChange={(e) => handleChange('honors', e.target.value)}
+          value={transcriptData.comments}
+          onChange={(e) => handleChange('comments', e.target.value)}
           className="input-field"
-          rows="3"
-          placeholder="List any honors, awards, or special recognitions"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Additional Notes
-        </label>
-        <textarea
-          value={transcriptData.notes}
-          onChange={(e) => handleChange('notes', e.target.value)}
-          className="input-field"
-          rows="3"
-          placeholder="Any additional information or notes"
+          rows="4"
+          placeholder="UNOFFICIAL TRANSCRIPT&#10;S- College Level&#10;IP- In Progress&#10;P- Pass&#10;F- Fail"
         />
       </div>
     </div>
