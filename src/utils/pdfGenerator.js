@@ -23,7 +23,7 @@ export const generatePDF = async (transcriptData) => {
 
     // Calculate PDF dimensions
     const imgWidth = 210 // A4 width in mm
-    const pageHeight = 295 // A4 height in mm
+    const pageHeight = 297 // A4 height in mm
     const imgHeight = (canvas.height * imgWidth) / canvas.width
     let heightLeft = imgHeight
 
@@ -73,7 +73,7 @@ export const generatePDFBlob = async (transcriptData) => {
     })
 
     const imgWidth = 210
-    const pageHeight = 295
+    const pageHeight = 297
     const imgHeight = (canvas.height * imgWidth) / canvas.width
     let heightLeft = imgHeight
 

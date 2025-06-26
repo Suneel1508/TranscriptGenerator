@@ -26,62 +26,53 @@
   }
 }
 
-.transcript-preview {
+/* Transcript Preview Styles */
+#transcript-preview {
   font-family: 'Times New Roman', serif;
-  line-height: 1.4;
+  line-height: 1.2;
+  font-size: 12px;
+  color: black;
 }
 
-.transcript-preview h1 {
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 16px;
-}
-
-.transcript-preview h2 {
+#transcript-preview h1 {
   font-size: 16px;
   font-weight: bold;
-  margin-bottom: 12px;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
-.transcript-preview h3 {
-  font-size: 14px;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.transcript-preview table {
+#transcript-preview table {
   border-collapse: collapse;
   width: 100%;
 }
 
-.transcript-preview th,
-.transcript-preview td {
+#transcript-preview th,
+#transcript-preview td {
   border: 1px solid #000;
-  padding: 4px;
+  padding: 3px;
   text-align: left;
-  font-size: 11px;
+  font-size: 9px;
 }
 
-.transcript-preview th {
+#transcript-preview th {
   background-color: #f5f5f5;
   font-weight: bold;
 }
 
-.transcript-preview .header {
-  text-align: center;
-  margin-bottom: 24px;
-  border-bottom: 2px solid #000;
-  padding-bottom: 16px;
-}
-
-.transcript-preview .signature-section {
-  text-align: center;
-  min-width: 200px;
-}
-
-.transcript-preview .signature-line {
-  border-top: 1px solid #000;
-  margin-top: 40px;
-  padding-top: 4px;
+/* Print styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  #transcript-preview, #transcript-preview * {
+    visibility: visible;
+  }
+  
+  #transcript-preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
 }

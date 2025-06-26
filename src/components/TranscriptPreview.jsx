@@ -37,159 +37,184 @@ const TranscriptPreview = () => {
   const groupedCourses = groupCoursesBySemester()
 
   return (
-    <div className="transcript-preview bg-white p-6 min-h-[800px] text-sm" id="transcript-preview">
+    <div className="transcript-preview bg-white p-8 min-h-[800px]" id="transcript-preview" style={{ fontFamily: 'Times New Roman, serif', fontSize: '12px', lineHeight: '1.2' }}>
       {/* Header */}
-      <div className="text-center mb-6 border-b-2 border-black pb-4">
-        <h1 className="text-xl font-bold mb-2">
+      <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid black', paddingBottom: '15px' }}>
+        <h1 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 10px 0' }}>
           {transcriptData.institutionName || 'LEGEND COLLEGE PREPARATORY TRANSCRIPT'}
         </h1>
-        <div className="text-xs space-y-1">
-          <p>{transcriptData.institutionAddress || '21050 McClellan Road, Cupertino CA 95014'}</p>
-          <p>
+        <div style={{ fontSize: '10px', lineHeight: '1.3' }}>
+          <div>{transcriptData.institutionAddress || '21050 McClellan Road, Cupertino CA 95014'}</div>
+          <div>
             {transcriptData.institutionPhone || 'Tel: (408)865-0366'} &nbsp;&nbsp;
             Email: {transcriptData.institutionEmail || 'transcript@legendcp.com'} &nbsp;&nbsp;
             CEEB Code: {transcriptData.ceebCode || '054732'}
-          </p>
+          </div>
         </div>
       </div>
 
       {/* Student Information */}
-      <div className="grid grid-cols-2 gap-8 mb-6">
-        <div className="space-y-2">
-          <div className="flex">
-            <span className="font-semibold w-24">Student Name:</span>
-            <span>{transcriptData.studentName || 'Student Name'}</span>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginBottom: '20px', fontSize: '11px' }}>
+        <div>
+          <div style={{ marginBottom: '8px' }}>
+            <strong>Student Name:</strong> {transcriptData.studentName || 'Student Name'}
           </div>
-          <div className="flex">
-            <span className="font-semibold w-24">Address:</span>
-            <span>{transcriptData.address || 'Student Address'}</span>
+          <div style={{ marginBottom: '8px' }}>
+            <strong>Address:</strong> {transcriptData.address || 'Student Address'}
           </div>
-          <div className="flex">
-            <span className="font-semibold w-24">Date of Birth:</span>
-            <span>{formatDate(transcriptData.dateOfBirth) || 'Date of Birth'}</span>
+          <div style={{ marginBottom: '8px' }}>
+            <strong>Date of Birth:</strong> {formatDate(transcriptData.dateOfBirth) || 'Date of Birth'}
           </div>
-          <div className="flex">
-            <span className="font-semibold w-24">Guardian:</span>
-            <span>{transcriptData.guardian || 'Guardian Name'}</span>
+          <div style={{ marginBottom: '8px' }}>
+            <strong>Guardian:</strong> {transcriptData.guardian || 'Guardian Name'}
           </div>
         </div>
-        <div className="space-y-2">
-          <div className="flex">
-            <span className="font-semibold w-24">Student Number:</span>
-            <span>{transcriptData.studentNumber || 'Student Number'}</span>
+        <div>
+          <div style={{ marginBottom: '8px' }}>
+            <strong>Student Number:</strong> {transcriptData.studentNumber || 'Student Number'}
           </div>
-          <div className="flex">
-            <span className="font-semibold w-24">Gender:</span>
-            <span>{transcriptData.gender || 'Gender'}</span>
+          <div style={{ marginBottom: '8px' }}>
+            <strong>Gender:</strong> {transcriptData.gender || 'Gender'}
           </div>
-          <div className="flex">
-            <span className="font-semibold w-24">SSN:</span>
-            <span>{transcriptData.ssn || '********'}</span>
+          <div style={{ marginBottom: '8px' }}>
+            <strong>SSN:</strong> {transcriptData.ssn || '********'}
           </div>
         </div>
       </div>
 
       {/* GPA Summary */}
-      <div className="mb-6">
-        <table className="w-full border border-black">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-black p-2 text-left font-bold">GPA Summary</th>
-              <th className="border border-black p-2 text-left font-bold">Total Credit Completed</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="border border-black p-2">
-                Cumulative GPA (Weighted): {transcriptData.cumulativeGPA || '0.00'}
-              </td>
-              <td className="border border-black p-2">
-                {transcriptData.totalCredits || '0'} Legend College Preparatory
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '15px', fontSize: '11px' }}>
+        <thead>
+          <tr style={{ backgroundColor: '#f0f0f0' }}>
+            <th style={{ border: '1px solid black', padding: '6px', textAlign: 'left', fontWeight: 'bold' }}>
+              GPA Summary
+            </th>
+            <th style={{ border: '1px solid black', padding: '6px', textAlign: 'left', fontWeight: 'bold' }}>
+              Total Credit Completed
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style={{ border: '1px solid black', padding: '6px' }}>
+              Cumulative GPA (Weighted): {transcriptData.cumulativeGPA || '0.00'}
+            </td>
+            <td style={{ border: '1px solid black', padding: '6px' }}>
+              {transcriptData.totalCredits || '0'} Legend College Preparatory
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       {/* Enrollment Summary */}
-      <div className="mb-6">
-        <table className="w-full border border-black">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-black p-2 text-left font-bold" colSpan="4">Enrollment Summary</th>
-              <th className="border border-black p-2 text-left font-bold">Total Credit Transferred</th>
+      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '15px', fontSize: '11px' }}>
+        <thead>
+          <tr style={{ backgroundColor: '#f0f0f0' }}>
+            <th style={{ border: '1px solid black', padding: '4px', textAlign: 'left', fontWeight: 'bold' }} colSpan="3">
+              Enrollment Summary
+            </th>
+            <th style={{ border: '1px solid black', padding: '4px', textAlign: 'left', fontWeight: 'bold' }}>
+              Total Credit Transferred
+            </th>
+          </tr>
+          <tr style={{ backgroundColor: '#f0f0f0' }}>
+            <th style={{ border: '1px solid black', padding: '3px', fontSize: '9px' }}>Start/End Date</th>
+            <th style={{ border: '1px solid black', padding: '3px', fontSize: '9px' }}>Grade</th>
+            <th style={{ border: '1px solid black', padding: '3px', fontSize: '9px' }}>School</th>
+            <th style={{ border: '1px solid black', padding: '3px', fontSize: '9px' }}></th>
+          </tr>
+        </thead>
+        <tbody>
+          {transcriptData.enrollmentSummary.map((enrollment, index) => (
+            <tr key={index}>
+              <td style={{ border: '1px solid black', padding: '3px', fontSize: '9px' }}>{enrollment.startEndDate}</td>
+              <td style={{ border: '1px solid black', padding: '3px', fontSize: '9px' }}>{enrollment.grade}</td>
+              <td style={{ border: '1px solid black', padding: '3px', fontSize: '9px' }}>{enrollment.school}</td>
+              <td style={{ border: '1px solid black', padding: '3px', fontSize: '9px' }}></td>
             </tr>
-            <tr className="bg-gray-100">
-              <th className="border border-black p-1 text-xs">Start/End Date</th>
-              <th className="border border-black p-1 text-xs">Grade</th>
-              <th className="border border-black p-1 text-xs">School</th>
-              <th className="border border-black p-1 text-xs"></th>
-              <th className="border border-black p-1 text-xs"></th>
-            </tr>
-          </thead>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Credit Summary */}
+      <div style={{ marginBottom: '15px' }}>
+        <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '11px' }}>
+          Credit Summary<br />
+          Curriculum Track: College Prep, Honors
+        </div>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px' }}>
           <tbody>
-            {/* Sample enrollment data - you can make this dynamic */}
             <tr>
-              <td className="border border-black p-1 text-xs">2016-2017</td>
-              <td className="border border-black p-1 text-xs">9</td>
-              <td className="border border-black p-1 text-xs">Leigh High School</td>
-              <td className="border border-black p-1 text-xs"></td>
-              <td className="border border-black p-1 text-xs"></td>
+              {transcriptData.creditSummary.slice(0, 4).map((credit, index) => (
+                <td key={index} style={{ border: '1px solid black', padding: '2px', verticalAlign: 'top', width: '25%' }}>
+                  <div><strong>{credit.subject}</strong></div>
+                  <div>Earned: {credit.earned}</div>
+                  <div>Required: {credit.required}</div>
+                </td>
+              ))}
+            </tr>
+            <tr>
+              {transcriptData.creditSummary.slice(4, 8).map((credit, index) => (
+                <td key={index} style={{ border: '1px solid black', padding: '2px', verticalAlign: 'top', width: '25%' }}>
+                  <div><strong>{credit.subject}</strong></div>
+                  <div>Earned: {credit.earned}</div>
+                  <div>Required: {credit.required}</div>
+                </td>
+              ))}
             </tr>
           </tbody>
         </table>
       </div>
 
       {/* Course Records */}
-      <div className="mb-6">
+      <div style={{ marginBottom: '20px' }}>
         {groupedCourses.map((semesterGroup, index) => (
-          <div key={index} className="mb-4">
-            <h3 className="font-bold mb-2">
+          <div key={index} style={{ marginBottom: '15px' }}>
+            <div style={{ fontWeight: 'bold', marginBottom: '5px', fontSize: '11px' }}>
               {semesterGroup.semester} Semester:
-            </h3>
-            <table className="w-full border border-black text-xs">
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px' }}>
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-black p-1">Grade Level</th>
-                  <th className="border border-black p-1">School Year</th>
-                  <th className="border border-black p-1">Course Title</th>
-                  <th className="border border-black p-1">H/AP</th>
-                  <th className="border border-black p-1">Grade</th>
-                  <th className="border border-black p-1">Credits</th>
-                  <th className="border border-black p-1">Grade Level</th>
-                  <th className="border border-black p-1">School Year</th>
-                  <th className="border border-black p-1">Course Title</th>
-                  <th className="border border-black p-1">H/AP</th>
-                  <th className="border border-black p-1">Grade</th>
-                  <th className="border border-black p-1">Credits</th>
+                <tr style={{ backgroundColor: '#f0f0f0' }}>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '8%' }}>Grade Level</th>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '8%' }}>School Year</th>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '25%' }}>Course Title</th>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '5%' }}>H/AP</th>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '5%' }}>Grade</th>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '7%' }}>Credits</th>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '8%' }}>Grade Level</th>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '8%' }}>School Year</th>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '25%' }}>Course Title</th>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '5%' }}>H/AP</th>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '5%' }}>Grade</th>
+                  <th style={{ border: '1px solid black', padding: '2px', width: '7%' }}>Credits</th>
                 </tr>
               </thead>
               <tbody>
-                {/* Split courses into two columns */}
                 {Array.from({ length: Math.ceil(semesterGroup.courses.length / 2) }).map((_, rowIndex) => {
                   const leftCourse = semesterGroup.courses[rowIndex * 2]
                   const rightCourse = semesterGroup.courses[rowIndex * 2 + 1]
                   
                   return (
                     <tr key={rowIndex}>
-                      <td className="border border-black p-1">{leftCourse?.gradeLevel || ''}</td>
-                      <td className="border border-black p-1">{leftCourse?.schoolYear || ''}</td>
-                      <td className="border border-black p-1">{leftCourse?.courseTitle || ''}</td>
-                      <td className="border border-black p-1">{leftCourse?.hap || ''}</td>
-                      <td className="border border-black p-1">{leftCourse?.grade || ''}</td>
-                      <td className="border border-black p-1">{leftCourse?.credits || ''}</td>
-                      <td className="border border-black p-1">{rightCourse?.gradeLevel || ''}</td>
-                      <td className="border border-black p-1">{rightCourse?.schoolYear || ''}</td>
-                      <td className="border border-black p-1">{rightCourse?.courseTitle || ''}</td>
-                      <td className="border border-black p-1">{rightCourse?.hap || ''}</td>
-                      <td className="border border-black p-1">{rightCourse?.grade || ''}</td>
-                      <td className="border border-black p-1">{rightCourse?.credits || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{leftCourse?.gradeLevel || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{leftCourse?.schoolYear || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{leftCourse?.courseTitle || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{leftCourse?.hap || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{leftCourse?.grade || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{leftCourse?.credits || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{rightCourse?.gradeLevel || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{rightCourse?.schoolYear || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{rightCourse?.courseTitle || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{rightCourse?.hap || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{rightCourse?.grade || ''}</td>
+                      <td style={{ border: '1px solid black', padding: '2px' }}>{rightCourse?.credits || ''}</td>
                     </tr>
                   )
                 })}
               </tbody>
             </table>
-            <div className="text-xs mt-1">
+            <div style={{ fontSize: '9px', marginTop: '3px' }}>
               Sem. GPA (Weighted): {(Math.random() * 1 + 3.5).toFixed(2)}
             </div>
           </div>
@@ -197,42 +222,42 @@ const TranscriptPreview = () => {
       </div>
 
       {/* Comments and Signatures */}
-      <div className="grid grid-cols-2 gap-8 mt-8">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginTop: '20px' }}>
         <div>
-          <h3 className="font-bold mb-2">Comments</h3>
-          <div className="border border-black p-4 min-h-32">
-            <div className="whitespace-pre-line text-xs">
+          <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '11px' }}>Comments</div>
+          <div style={{ border: '1px solid black', padding: '10px', minHeight: '120px', fontSize: '9px' }}>
+            <div style={{ whiteSpace: 'pre-line' }}>
               {transcriptData.comments || 'UNOFFICIAL TRANSCRIPT\nS- College Level\nIP- In Progress\nP- Pass\nF- Fail'}
             </div>
           </div>
         </div>
         
-        <div className="text-center">
+        <div style={{ textAlign: 'center' }}>
           {/* Digital Stamp */}
           {transcriptData.digitalStamp && (
-            <div className="mb-4">
+            <div style={{ marginBottom: '15px' }}>
               <img
                 src={transcriptData.digitalStamp.preview}
                 alt="Official Stamp"
-                className="h-20 mx-auto"
+                style={{ height: '60px', margin: '0 auto' }}
               />
             </div>
           )}
           
           {/* Principal Signature */}
-          <div className="mt-8">
+          <div style={{ marginTop: '30px' }}>
             {transcriptData.signature && (
-              <div className="mb-2">
+              <div style={{ marginBottom: '8px' }}>
                 <img
                   src={transcriptData.signature.preview}
                   alt="Principal Signature"
-                  className="h-12 mx-auto"
+                  style={{ height: '40px', margin: '0 auto' }}
                 />
               </div>
             )}
-            <div className="border-t border-black pt-1">
-              <p className="text-xs">Principal Signature: {transcriptData.principalName || 'Principal Name'}</p>
-              <p className="text-xs">Date: {formatDate(transcriptData.dateSigned) || formatDate(new Date().toISOString().split('T')[0])}</p>
+            <div style={{ borderTop: '1px solid black', paddingTop: '4px', fontSize: '9px' }}>
+              <div>Principal Signature: {transcriptData.principalName || 'Principal Name'}</div>
+              <div>Date: {formatDate(transcriptData.dateSigned) || formatDate(new Date().toISOString().split('T')[0])}</div>
             </div>
           </div>
         </div>

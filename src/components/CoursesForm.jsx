@@ -223,6 +223,9 @@ const CoursesForm = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Semester
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Grade
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -251,6 +254,9 @@ const CoursesForm = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {transcriptData.courses.map((course) => (
                   <tr key={course.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {course.semester}
+                    </td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {course.gradeLevel}
                     </td>
