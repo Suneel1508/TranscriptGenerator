@@ -5,7 +5,7 @@ import { Search, Filter, Download, Edit, Trash2, Calendar, SortAsc, SortDesc, Fi
 import { Link } from 'react-router-dom'
 
 const PastTranscripts = () => {
-  const { savedTranscripts, loadTranscript, deleteTranscript } = useTransc ript()
+  const { savedTranscripts, loadTranscript, deleteTranscript } = useTranscript()
   const [searchTerm, setSearchTerm] = useState('')
   const [sortField, setSortField] = useState('createdAt')
   const [sortDirection, setSortDirection] = useState('desc')
