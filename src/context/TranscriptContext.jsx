@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import { 
+  saveTranscript as saveTranscriptToSupabase, 
+  getTranscripts, 
+  updateTranscript, 
+  deleteTranscript as deleteTranscriptFromSupabase,
+  getTranscriptsBySSN 
+} from '../lib/supabase'
 
 const TranscriptContext = createContext()
 
@@ -68,6 +75,35 @@ const TranscriptProvider = ({ children }) => {
   })
 
   const [savedTranscripts, setSavedTranscripts] = useState([])
+  const [currentTranscriptId, setCurrentTranscriptId] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  // Load transcripts from Supabase on component mount
+  useEffect(() => {
+    loadTranscripts()
+  }, [])
+
+  const loadTranscripts = async () => {
+    setIsLoading(true)
+    try {
+      const result = await getTranscripts()
+      if (result.success) {
+        // Transform Supabase data to match existing format
+        const transformedTranscripts = result.transcripts.map(transcript => ({
+          id: transcript.id,
+          name: transcript.name,
+          data: transcript.data,
+          createdAt: transcript.created_at,
+          createdBy: transcript.admin_users?.name || 'Unknown'
+        }))
+        setSavedTranscripts(transformedTranscripts)
+      }
+    } catch (error) {
+      console.error('Error loading transcripts:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const updateTranscriptData = (newData) => {
     setTranscriptData(prev => ({ ...prev, ...newData }))
@@ -118,26 +154,126 @@ const TranscriptProvider = ({ children }) => {
     }))
   }
 
-  const saveTranscript = (name) => {
-    const transcript = {
-      id: Date.now(),
-      name,
-      data: transcriptData,
-      createdAt: new Date().toISOString()
+  const saveTranscript = async (name) => {
+    try {
+      setIsLoading(true)
+      
+      if (currentTranscriptId) {
+        // Update existing transcript
+        const result = await updateTranscript(currentTranscriptId, transcriptData, name)
+        if (result.success) {
+          await loadTranscripts() // Reload transcripts
+          return { success: true, transcript: result.transcript }
+        }
+        return { success: false, error: result.error }
+      } else {
+        // Create new transcript
+        const result = await saveTranscriptToSupabase(transcriptData, name)
+        if (result.success) {
+          await loadTranscripts() // Reload transcripts
+          setCurrentTranscriptId(result.transcript.id)
+          return { success: true, transcript: result.transcript }
+        }
+        return { success: false, error: result.error }
+      }
+    } catch (error) {
+      console.error('Error saving transcript:', error)
+      return { success: false, error: 'Failed to save transcript' }
+    } finally {
+      setIsLoading(false)
     }
-    setSavedTranscripts(prev => [...prev, transcript])
-    return transcript
   }
 
   const loadTranscript = (transcriptId) => {
     const transcript = savedTranscripts.find(t => t.id === transcriptId)
     if (transcript) {
       setTranscriptData(transcript.data)
+      setCurrentTranscriptId(transcriptId)
     }
   }
 
-  const deleteTranscript = (transcriptId) => {
-    setSavedTranscripts(prev => prev.filter(t => t.id !== transcriptId))
+  const deleteTranscript = async (transcriptId) => {
+    try {
+      setIsLoading(true)
+      const result = await deleteTranscriptFromSupabase(transcriptId)
+      if (result.success) {
+        await loadTranscripts() // Reload transcripts
+        // If we're currently editing this transcript, reset the form
+        if (currentTranscriptId === transcriptId) {
+          setCurrentTranscriptId(null)
+          // Optionally reset form data
+        }
+        return { success: true }
+      }
+      return { success: false, error: result.error }
+    } catch (error) {
+      console.error('Error deleting transcript:', error)
+      return { success: false, error: 'Failed to delete transcript' }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const createNewTranscript = () => {
+    setCurrentTranscriptId(null)
+    setTranscriptData({
+      // Reset to default values
+      institutionName: '',
+      institutionAddress: '',
+      institutionPhone: '',
+      institutionEmail: '',
+      ceebCode: '',
+      studentName: '',
+      studentNumber: '',
+      address: '',
+      dateOfBirth: '',
+      gender: '',
+      guardian: '',
+      ssn: '',
+      cumulativeGPA: '',
+      totalCredits: '',
+      principalName: '',
+      dateSigned: '',
+      comments: '',
+      enrollmentSummary: [
+        { startEndDate: '', grade: '', school: '' },
+        { startEndDate: '', grade: '', school: '' },
+        { startEndDate: '', grade: '', school: '' }
+      ],
+      creditSummary: [
+        { subject: 'History/Social Science', earned: 0, required: 0 },
+        { subject: 'English', earned: 0, required: 0 },
+        { subject: 'Mathematics', earned: 0, required: 0 },
+        { subject: 'Laboratory Science', earned: 0, required: 0 },
+        { subject: 'Foreign Language', earned: 0, required: 0 },
+        { subject: 'Arts', earned: 0, required: 0 },
+        { subject: 'Elective', earned: 0, required: 0 },
+        { subject: 'Physical Education', earned: 0, required: 0 }
+      ],
+      courses: [],
+      photo: null,
+      digitalStamp: null,
+      signature: null
+    })
+  }
+
+  const getStudentTranscripts = async (ssn) => {
+    try {
+      const result = await getTranscriptsBySSN(ssn)
+      if (result.success) {
+        return result.transcripts.map(transcript => ({
+          id: transcript.id,
+          name: transcript.name,
+          data: transcript.data,
+          createdAt: transcript.created_at,
+          createdBy: transcript.admin_users?.name || 'Unknown'
+        }))
+      }
+      return []
+    } catch (error) {
+      console.error('Error getting student transcripts:', error)
+      return []
+    }
   }
 
   const value = {
@@ -150,9 +286,14 @@ const TranscriptProvider = ({ children }) => {
     saveTranscript,
     loadTranscript,
     deleteTranscript,
+    createNewTranscript,
+    getStudentTranscripts,
     formatSSNForDisplay,
     validateSSN,
-    formatSSNInput
+    formatSSNInput,
+    currentTranscriptId,
+    isLoading,
+    loadTranscripts
   }
 
   return (

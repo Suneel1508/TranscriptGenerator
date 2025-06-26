@@ -4,15 +4,16 @@ import CoursesForm from '../components/CoursesForm'
 import FilesUpload from '../components/FilesUpload'
 import TranscriptPreview from '../components/TranscriptPreview'
 import { useTranscript } from '../context/TranscriptContext'
-import { Save, Download, Eye, EyeOff } from 'lucide-react'
+import { Save, Download, Eye, EyeOff, Plus } from 'lucide-react'
 import { generatePDF } from '../utils/pdfGenerator'
 import { useNavigate } from 'react-router-dom'
 
 const TranscriptForm = () => {
-  const { transcriptData, saveTranscript } = useTranscript()
+  const { transcriptData, saveTranscript, createNewTranscript, currentTranscriptId, isLoading } = useTranscript()
   const [activeTab, setActiveTab] = useState('student')
   const [showPreview, setShowPreview] = useState(true)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const navigate = useNavigate()
 
   const tabs = [
@@ -21,11 +22,16 @@ const TranscriptForm = () => {
     { id: 'files', label: 'Files & Assets', component: FilesUpload }
   ]
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    setSaveError('')
     const name = prompt('Enter a name for this transcript:')
     if (name) {
-      saveTranscript(name)
-      alert('Transcript saved successfully!')
+      const result = await saveTranscript(name)
+      if (result.success) {
+        alert('Transcript saved successfully!')
+      } else {
+        setSaveError(result.error || 'Failed to save transcript')
+      }
     }
   }
 
@@ -41,15 +47,36 @@ const TranscriptForm = () => {
     }
   }
 
+  const handleNewTranscript = () => {
+    if (confirm('Are you sure you want to create a new transcript? Any unsaved changes will be lost.')) {
+      createNewTranscript()
+    }
+  }
+
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component
 
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Create Transcript</h1>
-        <p className="text-gray-600">
-          Fill out the form below to generate a professional academic transcript.
-        </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              {currentTranscriptId ? 'Edit Transcript' : 'Create Transcript'}
+            </h1>
+            <p className="text-gray-600">
+              Fill out the form below to generate a professional academic transcript.
+            </p>
+          </div>
+          {currentTranscriptId && (
+            <button
+              onClick={handleNewTranscript}
+              className="btn-secondary flex items-center space-x-2"
+            >
+              <Plus className="h-4 w-4" />
+              <span>New Transcript</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Action Buttons */}
@@ -63,10 +90,11 @@ const TranscriptForm = () => {
         </button>
         <button
           onClick={handleSave}
-          className="btn-secondary flex items-center space-x-2"
+          disabled={isLoading}
+          className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
         >
           <Save className="h-4 w-4" />
-          <span>Save Progress</span>
+          <span>{isLoading ? 'Saving...' : currentTranscriptId ? 'Update' : 'Save'} Progress</span>
         </button>
         <button
           onClick={handleGeneratePDF}
@@ -83,6 +111,13 @@ const TranscriptForm = () => {
           <span>View Past Transcripts</span>
         </button>
       </div>
+
+      {/* Error Message */}
+      {saveError && (
+        <div className="bg-red-50 border border-red-200 rounded-md p-3 mb-6">
+          <p className="text-sm text-red-600">{saveError}</p>
+        </div>
+      )}
 
       <div className={`grid gap-8 ${showPreview ? 'lg:grid-cols-2' : 'lg:grid-cols-1'}`}>
         {/* Form Section */}

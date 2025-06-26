@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { authenticateAdmin, getCurrentAdmin, logoutAdmin } from '../lib/supabase'
 
 const AuthContext = createContext()
 
@@ -13,39 +14,44 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-
-  // Admin credentials (in a real app, this would be handled by a backend)
-  const ADMIN_CREDENTIALS = {
-    username: 'admin',
-    password: 'transcript2025'
-  }
+  const [currentUser, setCurrentUser] = useState(null)
 
   useEffect(() => {
     // Check if user is already logged in
-    const authStatus = localStorage.getItem('isAuthenticated')
-    if (authStatus === 'true') {
+    const adminUser = getCurrentAdmin()
+    if (adminUser) {
       setIsAuthenticated(true)
+      setCurrentUser(adminUser)
     }
     setIsLoading(false)
   }, [])
 
-  const login = (username, password) => {
-    if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-      setIsAuthenticated(true)
-      localStorage.setItem('isAuthenticated', 'true')
-      return { success: true }
+  const login = async (email, password) => {
+    try {
+      const result = await authenticateAdmin(email, password)
+      
+      if (result.success) {
+        setIsAuthenticated(true)
+        setCurrentUser(result.user)
+        return { success: true }
+      }
+      
+      return { success: false, error: result.error }
+    } catch (error) {
+      return { success: false, error: 'Login failed. Please try again.' }
     }
-    return { success: false, error: 'Invalid username or password' }
   }
 
   const logout = () => {
+    logoutAdmin()
     setIsAuthenticated(false)
-    localStorage.removeItem('isAuthenticated')
+    setCurrentUser(null)
   }
 
   const value = {
     isAuthenticated,
     isLoading,
+    currentUser,
     login,
     logout
   }

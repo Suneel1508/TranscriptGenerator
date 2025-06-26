@@ -7,7 +7,7 @@ const LoginForm = () => {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: ''
   })
   const [showPassword, setShowPassword] = useState(false)
@@ -19,7 +19,7 @@ const LoginForm = () => {
     setIsLoading(true)
     setError('')
 
-    const result = login(formData.username, formData.password)
+    const result = await login(formData.email, formData.password)
     
     if (result.success) {
       // Redirect to home page on successful login
@@ -51,18 +51,18 @@ const LoginForm = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username
+                Email
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  type="text"
-                  value={formData.username}
-                  onChange={(e) => handleChange('username', e.target.value)}
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
                   className="input-field pl-10"
-                  placeholder="Enter username"
+                  placeholder="Enter email address"
                   required
                 />
               </div>
@@ -115,7 +115,7 @@ const LoginForm = () => {
 
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <h3 className="text-sm font-medium text-gray-900 mb-2">Demo Credentials:</h3>
-            <p className="text-sm text-gray-600">Username: <code className="bg-gray-200 px-1 rounded">admin</code></p>
+            <p className="text-sm text-gray-600">Email: <code className="bg-gray-200 px-1 rounded">admin@transcript.com</code></p>
             <p className="text-sm text-gray-600">Password: <code className="bg-gray-200 px-1 rounded">transcript2025</code></p>
           </div>
         </div>
