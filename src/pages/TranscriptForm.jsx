@@ -6,12 +6,14 @@ import TranscriptPreview from '../components/TranscriptPreview'
 import { useTranscript } from '../context/TranscriptContext'
 import { Save, Download, Eye, EyeOff } from 'lucide-react'
 import { generatePDF } from '../utils/pdfGenerator'
+import { useNavigate } from 'react-router-dom'
 
 const TranscriptForm = () => {
   const { transcriptData, saveTranscript } = useTranscript()
   const [activeTab, setActiveTab] = useState('student')
   const [showPreview, setShowPreview] = useState(true)
   const [isGenerating, setIsGenerating] = useState(false)
+  const navigate = useNavigate()
 
   const tabs = [
     { id: 'student', label: 'Student Info', component: StudentInfoForm },
@@ -73,6 +75,12 @@ const TranscriptForm = () => {
         >
           <Download className="h-4 w-4" />
           <span>{isGenerating ? 'Generating...' : 'Generate PDF'}</span>
+        </button>
+        <button
+          onClick={() => navigate('/past-transcripts')}
+          className="btn-secondary flex items-center space-x-2"
+        >
+          <span>View Past Transcripts</span>
         </button>
       </div>
 
