@@ -2,10 +2,15 @@ import React from 'react'
 import { useTranscript } from '../context/TranscriptContext'
 
 const StudentInfoForm = () => {
-  const { transcriptData, updateTranscriptData } = useTranscript()
+  const { transcriptData, updateTranscriptData, formatSSNInput } = useTranscript()
 
   const handleChange = (field, value) => {
     updateTranscriptData({ [field]: value })
+  }
+
+  const handleSSNChange = (e) => {
+    const formattedSSN = formatSSNInput(e.target.value)
+    updateTranscriptData({ ssn: formattedSSN })
   }
 
   const handleEnrollmentChange = (index, field, value) => {
@@ -175,15 +180,19 @@ const StudentInfoForm = () => {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            SSN
+            Social Security Number (SSN)
           </label>
           <input
             type="text"
             value={transcriptData.ssn}
-            onChange={(e) => handleChange('ssn', e.target.value)}
+            onChange={handleSSNChange}
             className="input-field"
-            placeholder="e.g., ********"
+            placeholder="e.g., 123-45-6789"
+            maxLength="11"
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Only the last 4 digits will be displayed on the transcript for security.
+          </p>
         </div>
       </div>
 

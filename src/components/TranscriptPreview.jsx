@@ -2,7 +2,7 @@ import React from 'react'
 import { useTranscript } from '../context/TranscriptContext'
 
 const TranscriptPreview = () => {
-  const { transcriptData } = useTranscript()
+  const { transcriptData, formatSSNForDisplay } = useTranscript()
 
   const formatDate = (dateString) => {
     if (!dateString) return ''
@@ -77,7 +77,7 @@ const TranscriptPreview = () => {
             <strong>Gender:</strong> {transcriptData.gender || 'Gender'}
           </div>
           <div style={{ marginBottom: '8px' }}>
-            <strong>SSN:</strong> {transcriptData.ssn || '********'}
+            <strong>SSN:</strong> {formatSSNForDisplay(transcriptData.ssn)}
           </div>
         </div>
       </div>

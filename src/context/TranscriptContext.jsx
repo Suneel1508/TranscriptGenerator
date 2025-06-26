@@ -26,7 +26,7 @@ export const TranscriptProvider = ({ children }) => {
     dateOfBirth: '2002-03-15',
     gender: 'Male',
     guardian: 'Robert Smith, Jennifer Smith',
-    ssn: '********',
+    ssn: '', // Full SSN stored here
     
     // Academic Information
     cumulativeGPA: '4.25',
@@ -71,6 +71,28 @@ export const TranscriptProvider = ({ children }) => {
 
   const updateTranscriptData = (newData) => {
     setTranscriptData(prev => ({ ...prev, ...newData }))
+  }
+
+  // Helper function to format SSN for display (show only last 4 digits)
+  const formatSSNForDisplay = (ssn) => {
+    if (!ssn) return '********'
+    if (ssn.length < 4) return '********'
+    return '****' + ssn.slice(-4)
+  }
+
+  // Helper function to validate SSN format
+  const validateSSN = (ssn) => {
+    // Remove any non-digit characters
+    const cleanSSN = ssn.replace(/\D/g, '')
+    return cleanSSN.length === 9
+  }
+
+  // Helper function to format SSN input (XXX-XX-XXXX)
+  const formatSSNInput = (ssn) => {
+    const cleanSSN = ssn.replace(/\D/g, '')
+    if (cleanSSN.length <= 3) return cleanSSN
+    if (cleanSSN.length <= 5) return `${cleanSSN.slice(0, 3)}-${cleanSSN.slice(3)}`
+    return `${cleanSSN.slice(0, 3)}-${cleanSSN.slice(3, 5)}-${cleanSSN.slice(5, 9)}`
   }
 
   const addCourse = (course) => {
@@ -127,7 +149,10 @@ export const TranscriptProvider = ({ children }) => {
     savedTranscripts,
     saveTranscript,
     loadTranscript,
-    deleteTranscript
+    deleteTranscript,
+    formatSSNForDisplay,
+    validateSSN,
+    formatSSNInput
   }
 
   return (
