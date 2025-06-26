@@ -13,49 +13,49 @@ export const useTranscript = () => {
 export const TranscriptProvider = ({ children }) => {
   const [transcriptData, setTranscriptData] = useState({
     // Institution Information
-    institutionName: 'LEGEND COLLEGE PREPARATORY TRANSCRIPT',
-    institutionAddress: '21050 McClellan Road, Cupertino CA 95014',
-    institutionPhone: 'Tel: (408)865-0366',
-    institutionEmail: 'transcript@legendcp.com',
-    ceebCode: '054732',
+    institutionName: '',
+    institutionAddress: '',
+    institutionPhone: '',
+    institutionEmail: '',
+    ceebCode: '',
     
     // Student Information
-    studentName: 'Smith, John',
-    studentNumber: '12345',
-    address: '1234 Main Street, San Jose, CA 95124',
-    dateOfBirth: '2002-03-15',
-    gender: 'Male',
-    guardian: 'Robert Smith, Jennifer Smith',
+    studentName: '',
+    studentNumber: '',
+    address: '',
+    dateOfBirth: '',
+    gender: '',
+    guardian: '',
     ssn: '', // Full SSN stored here
     
     // Academic Information
-    cumulativeGPA: '4.25',
-    totalCredits: '20',
+    cumulativeGPA: '',
+    totalCredits: '',
     
     // Principal Information
-    principalName: 'Dr. Johnson',
-    dateSigned: new Date().toISOString().split('T')[0],
+    principalName: '',
+    dateSigned: '',
     
     // Comments
-    comments: 'UNOFFICIAL TRANSCRIPT\nS- College Level\nIP- In Progress\nP- Pass\nF- Fail',
+    comments: '',
     
     // Enrollment Summary
     enrollmentSummary: [
-      { startEndDate: '2016-2017', grade: '9', school: 'Leigh High School' },
-      { startEndDate: '2017-2018', grade: '10', school: 'Foothill College' },
-      { startEndDate: '2018-2019', grade: '11', school: 'Legend College Preparatory' }
+      { startEndDate: '', grade: '', school: '' },
+      { startEndDate: '', grade: '', school: '' },
+      { startEndDate: '', grade: '', school: '' }
     ],
     
     // Credit Summary
     creditSummary: [
-      { subject: 'History/Social Science', earned: 25, required: 30 },
-      { subject: 'English', earned: 40, required: 40 },
-      { subject: 'Mathematics', earned: 45, required: 40 },
-      { subject: 'Laboratory Science', earned: 35, required: 30 },
-      { subject: 'Foreign Language', earned: 10, required: 20 },
-      { subject: 'Arts', earned: 10, required: 20 },
-      { subject: 'Elective', earned: 60, required: 70 },
-      { subject: 'Physical Education', earned: 20, required: 10 }
+      { subject: 'History/Social Science', earned: 0, required: 0 },
+      { subject: 'English', earned: 0, required: 0 },
+      { subject: 'Mathematics', earned: 0, required: 0 },
+      { subject: 'Laboratory Science', earned: 0, required: 0 },
+      { subject: 'Foreign Language', earned: 0, required: 0 },
+      { subject: 'Arts', earned: 0, required: 0 },
+      { subject: 'Elective', earned: 0, required: 0 },
+      { subject: 'Physical Education', earned: 0, required: 0 }
     ],
     
     // Courses

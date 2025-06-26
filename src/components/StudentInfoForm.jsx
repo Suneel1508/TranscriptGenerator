@@ -42,7 +42,7 @@ const StudentInfoForm = () => {
               value={transcriptData.institutionName}
               onChange={(e) => handleChange('institutionName', e.target.value)}
               className="input-field"
-              placeholder="e.g., LEGEND COLLEGE PREPARATORY"
+              placeholder="e.g., ABC High School"
             />
           </div>
           <div>
@@ -54,7 +54,7 @@ const StudentInfoForm = () => {
               value={transcriptData.institutionAddress}
               onChange={(e) => handleChange('institutionAddress', e.target.value)}
               className="input-field"
-              placeholder="e.g., 21050 McClellan Road, Cupertino CA 95014"
+              placeholder="e.g., 123 Main Street, City, State 12345"
             />
           </div>
           <div>
@@ -66,7 +66,7 @@ const StudentInfoForm = () => {
               value={transcriptData.institutionPhone}
               onChange={(e) => handleChange('institutionPhone', e.target.value)}
               className="input-field"
-              placeholder="e.g., Tel: (408)865-0366"
+              placeholder="e.g., Tel: (555) 123-4567"
             />
           </div>
           <div>
@@ -78,7 +78,7 @@ const StudentInfoForm = () => {
               value={transcriptData.institutionEmail}
               onChange={(e) => handleChange('institutionEmail', e.target.value)}
               className="input-field"
-              placeholder="e.g., transcript@legendcp.com"
+              placeholder="e.g., registrar@school.edu"
             />
           </div>
           <div>
@@ -90,7 +90,7 @@ const StudentInfoForm = () => {
               value={transcriptData.ceebCode}
               onChange={(e) => handleChange('ceebCode', e.target.value)}
               className="input-field"
-              placeholder="e.g., 054732"
+              placeholder="e.g., 123456"
             />
           </div>
         </div>
@@ -107,7 +107,7 @@ const StudentInfoForm = () => {
             value={transcriptData.studentName}
             onChange={(e) => handleChange('studentName', e.target.value)}
             className="input-field"
-            placeholder="e.g., Smith, John"
+            placeholder="e.g., Last, First Middle"
           />
         </div>
 
@@ -120,7 +120,7 @@ const StudentInfoForm = () => {
             value={transcriptData.studentNumber}
             onChange={(e) => handleChange('studentNumber', e.target.value)}
             className="input-field"
-            placeholder="e.g., 12345"
+            placeholder="e.g., 2024001"
           />
         </div>
 
@@ -133,7 +133,7 @@ const StudentInfoForm = () => {
             value={transcriptData.address}
             onChange={(e) => handleChange('address', e.target.value)}
             className="input-field"
-            placeholder="e.g., 1234 Main Street, San Jose, CA 95124"
+            placeholder="e.g., 456 Oak Avenue, City, State 12345"
           />
         </div>
 
@@ -174,7 +174,7 @@ const StudentInfoForm = () => {
             value={transcriptData.guardian}
             onChange={(e) => handleChange('guardian', e.target.value)}
             className="input-field"
-            placeholder="e.g., Robert Smith, Jennifer Smith"
+            placeholder="e.g., Parent/Guardian Name"
           />
         </div>
 
@@ -212,7 +212,7 @@ const StudentInfoForm = () => {
               value={transcriptData.cumulativeGPA}
               onChange={(e) => handleChange('cumulativeGPA', e.target.value)}
               className="input-field"
-              placeholder="e.g., 4.25"
+              placeholder="e.g., 3.85"
             />
           </div>
           <div>
@@ -226,7 +226,7 @@ const StudentInfoForm = () => {
               value={transcriptData.totalCredits}
               onChange={(e) => handleChange('totalCredits', e.target.value)}
               className="input-field"
-              placeholder="e.g., 20"
+              placeholder="e.g., 24"
             />
           </div>
         </div>
@@ -246,7 +246,7 @@ const StudentInfoForm = () => {
                 value={enrollment.startEndDate}
                 onChange={(e) => handleEnrollmentChange(index, 'startEndDate', e.target.value)}
                 className="input-field"
-                placeholder="e.g., 2016-2017"
+                placeholder="e.g., 2020-2021"
               />
             </div>
             <div>
@@ -270,7 +270,7 @@ const StudentInfoForm = () => {
                 value={enrollment.school}
                 onChange={(e) => handleEnrollmentChange(index, 'school', e.target.value)}
                 className="input-field"
-                placeholder="e.g., Leigh High School"
+                placeholder="e.g., Previous School Name"
               />
             </div>
           </div>
@@ -337,7 +337,7 @@ const StudentInfoForm = () => {
               value={transcriptData.principalName}
               onChange={(e) => handleChange('principalName', e.target.value)}
               className="input-field"
-              placeholder="Principal's Name"
+              placeholder="e.g., Dr. Jane Smith"
             />
           </div>
           <div>
@@ -364,7 +364,7 @@ const StudentInfoForm = () => {
           onChange={(e) => handleChange('comments', e.target.value)}
           className="input-field"
           rows="4"
-          placeholder="UNOFFICIAL TRANSCRIPT&#10;S- College Level&#10;IP- In Progress&#10;P- Pass&#10;F- Fail"
+          placeholder="Enter any additional comments or notes about the transcript..."
         />
       </div>
     </div>

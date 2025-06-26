@@ -44,8 +44,8 @@ const Home = () => {
       {/* Hero Section */}
       <div className="text-center mb-16 pt-10">
         <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-          Legend College Preparatory
-          <span className="text-primary-600"> Transcript System</span>
+          Transcript Preparatory
+          <span className="text-primary-600"> System</span>
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
           Create official academic transcripts with ease. Fill out forms, preview in real-time, 

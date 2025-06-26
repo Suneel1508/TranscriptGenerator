@@ -41,14 +41,14 @@ const TranscriptPreview = () => {
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '20px', borderBottom: '2px solid black', paddingBottom: '15px' }}>
         <h1 style={{ fontSize: '16px', fontWeight: 'bold', margin: '0 0 10px 0' }}>
-          {transcriptData.institutionName || 'LEGEND COLLEGE PREPARATORY TRANSCRIPT'}
+          {transcriptData.institutionName || 'TRANSCRIPT PREPARATORY SYSTEM'}
         </h1>
         <div style={{ fontSize: '10px', lineHeight: '1.3' }}>
-          <div>{transcriptData.institutionAddress || '21050 McClellan Road, Cupertino CA 95014'}</div>
+          <div>{transcriptData.institutionAddress || 'Institution Address'}</div>
           <div>
-            {transcriptData.institutionPhone || 'Tel: (408)865-0366'} &nbsp;&nbsp;
-            Email: {transcriptData.institutionEmail || 'transcript@legendcp.com'} &nbsp;&nbsp;
-            CEEB Code: {transcriptData.ceebCode || '054732'}
+            {transcriptData.institutionPhone || 'Tel: (000) 000-0000'} &nbsp;&nbsp;
+            Email: {transcriptData.institutionEmail || 'email@institution.edu'} &nbsp;&nbsp;
+            CEEB Code: {transcriptData.ceebCode || '000000'}
           </div>
         </div>
       </div>
@@ -100,7 +100,7 @@ const TranscriptPreview = () => {
               Cumulative GPA (Weighted): {transcriptData.cumulativeGPA || '0.00'}
             </td>
             <td style={{ border: '1px solid black', padding: '6px' }}>
-              {transcriptData.totalCredits || '0'} Legend College Preparatory
+              {transcriptData.totalCredits || '0'} {transcriptData.institutionName || 'Institution Name'}
             </td>
           </tr>
         </tbody>
@@ -227,7 +227,7 @@ const TranscriptPreview = () => {
           <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '11px' }}>Comments</div>
           <div style={{ border: '1px solid black', padding: '10px', minHeight: '120px', fontSize: '9px' }}>
             <div style={{ whiteSpace: 'pre-line' }}>
-              {transcriptData.comments || 'UNOFFICIAL TRANSCRIPT\nS- College Level\nIP- In Progress\nP- Pass\nF- Fail'}
+              {transcriptData.comments || 'Comments section'}
             </div>
           </div>
         </div>
