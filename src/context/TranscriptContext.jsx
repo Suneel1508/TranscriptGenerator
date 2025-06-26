@@ -10,7 +10,7 @@ export const useTranscript = () => {
   return context
 }
 
-export const TranscriptProvider = ({ children }) => {
+const TranscriptProvider = ({ children }) => {
   const [transcriptData, setTranscriptData] = useState({
     // Institution Information
     institutionName: '',
@@ -161,3 +161,5 @@ export const TranscriptProvider = ({ children }) => {
     </TranscriptContext.Provider>
   )
 }
+
+export default TranscriptProvider

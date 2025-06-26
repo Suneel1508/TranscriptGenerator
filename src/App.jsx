@@ -8,7 +8,7 @@ import Students from './pages/Students'
 import Dashboard from './components/Dashboard'
 import LoginForm from './components/LoginForm'
 import ProtectedRoute from './components/ProtectedRoute'
-import { TranscriptProvider } from './context/TranscriptContext'
+import TranscriptProvider from './context/TranscriptContext'
 import { AuthProvider } from './context/AuthContext'
 
 function App() {
