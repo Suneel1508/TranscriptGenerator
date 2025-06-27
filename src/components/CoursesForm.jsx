@@ -69,17 +69,24 @@ const CoursesForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     
+    // For IP grades, don't require credits
+    const isIPGrade = courseForm.grade === 'IP'
+    const courseToValidate = isIPGrade ? { ...courseForm, credits: '0' } : courseForm
+    
     // Validate course data
-    const validation = validateCourse(courseForm)
+    const validation = validateCourse(courseToValidate)
     if (!validation.isValid) {
       alert('Please fix the following errors:\n' + validation.errors.join('\n'))
       return
     }
 
+    // For IP grades, set credits to empty string
+    const finalCourse = isIPGrade ? { ...courseForm, credits: '' } : courseForm
+
     if (editingCourse) {
-      updateCourse(editingCourse.id, courseForm)
+      updateCourse(editingCourse.id, finalCourse)
     } else {
-      addCourse(courseForm)
+      addCourse(finalCourse)
     }
     resetForm()
   }
@@ -111,11 +118,9 @@ const CoursesForm = () => {
   const groupCoursesBySemester = () => {
     const grouped = {}
     transcriptData.courses.forEach(course => {
-      const key = `${course.gradeLevel}-${course.schoolYear}-${course.semester}`
+      const key = `${course.semester}`
       if (!grouped[key]) {
         grouped[key] = {
-          gradeLevel: course.gradeLevel,
-          schoolYear: course.schoolYear,
           semester: course.semester,
           courses: []
         }
@@ -123,8 +128,6 @@ const CoursesForm = () => {
       grouped[key].courses.push(course)
     })
     return Object.values(grouped).sort((a, b) => {
-      if (a.gradeLevel !== b.gradeLevel) return a.gradeLevel - b.gradeLevel
-      if (a.schoolYear !== b.schoolYear) return a.schoolYear.localeCompare(b.schoolYear)
       return a.semester.localeCompare(b.semester)
     })
   }
@@ -132,6 +135,9 @@ const CoursesForm = () => {
   const semesterGroups = groupCoursesBySemester()
   const semesterGPAs = calculateSemesterGPA(transcriptData.courses, true)
   const yearlyGPAs = calculateYearlyGPA(transcriptData.courses, true)
+
+  // Check if current grade is IP to disable credits
+  const isIPGrade = courseForm.grade === 'IP'
 
   return (
     <div className="space-y-6">
@@ -267,7 +273,7 @@ const CoursesForm = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Credits *
+                  Credits {!isIPGrade && '*'}
                 </label>
                 <input
                   type="number"
@@ -275,10 +281,16 @@ const CoursesForm = () => {
                   min="0"
                   value={courseForm.credits}
                   onChange={(e) => setCourseForm(prev => ({ ...prev, credits: e.target.value }))}
-                  className="input-field"
-                  placeholder="e.g., 5"
-                  required
+                  className={`input-field ${isIPGrade ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  placeholder={isIPGrade ? 'N/A for IP grades' : 'e.g., 5'}
+                  disabled={isIPGrade}
+                  required={!isIPGrade}
                 />
+                {isIPGrade && (
+                  <p className="text-xs text-orange-600 mt-1">
+                    Credits not required for In Progress (IP) courses
+                  </p>
+                )}
               </div>
               <div className="md:col-span-3">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -299,7 +311,7 @@ const CoursesForm = () => {
             </div>
 
             {/* Real-time calculation preview */}
-            {courseForm.grade && courseForm.credits && (
+            {courseForm.grade && (courseForm.credits || isIPGrade) && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <div className="text-sm text-blue-900">
                   <strong>Course Preview:</strong> {getCourseLevelName(courseForm.hap)} • 
@@ -327,27 +339,30 @@ const CoursesForm = () => {
         </div>
       )}
 
-      {/* Courses List by Semester */}
+      {/* Courses List by Semester - NEW FORMAT */}
       {transcriptData.courses.length > 0 ? (
         <div className="space-y-6">
           {semesterGroups.map((semesterGroup, index) => {
-            const semesterKey = `${semesterGroup.gradeLevel}-${semesterGroup.schoolYear}-${semesterGroup.semester}`
-            const semesterGPA = semesterGPAs[semesterKey]
-            
+            // Group courses by grade level within semester
+            const gradeGroups = {}
+            semesterGroup.courses.forEach(course => {
+              const gradeKey = `${course.gradeLevel}-${course.schoolYear}`
+              if (!gradeGroups[gradeKey]) {
+                gradeGroups[gradeKey] = {
+                  gradeLevel: course.gradeLevel,
+                  schoolYear: course.schoolYear,
+                  courses: []
+                }
+              }
+              gradeGroups[gradeKey].courses.push(course)
+            })
+
             return (
               <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
                 <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium text-gray-900">
-                      Grade {semesterGroup.gradeLevel} - {semesterGroup.semester} Semester ({semesterGroup.schoolYear})
-                    </h4>
-                    {semesterGPA && (
-                      <div className="text-sm text-gray-600">
-                        Semester GPA: <span className="font-medium">{semesterGPA.gpa.toFixed(3)}</span> • 
-                        Credits: <span className="font-medium">{semesterGPA.totalCredits}</span>
-                      </div>
-                    )}
-                  </div>
+                  <h4 className="font-medium text-gray-900">
+                    {semesterGroup.semester} Semester:
+                  </h4>
                 </div>
                 
                 <div className="overflow-x-auto">
@@ -355,19 +370,22 @@ const CoursesForm = () => {
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Grade Level
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          School Year
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Course Title
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Level
+                          H/AP
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Grade
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Credits
-                        </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Points
                         </th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           School
@@ -378,62 +396,84 @@ const CoursesForm = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {semesterGroup.courses.map((course) => {
-                        const weightedPoints = calculateCoursePoints(course.grade, course.credits, course.hap, true)
-                        const countsForGPA = isGradeCountedForGPA(course.grade)
-                        const countsForCredits = isGradeCountedForCredits(course.grade)
-                        
-                        return (
-                          <tr key={course.id} className={`hover:bg-gray-50 ${!countsForGPA ? 'bg-yellow-50' : ''}`}>
-                            <td className="px-4 py-4 text-sm text-gray-900">
-                              {course.courseTitle}
-                              {!countsForGPA && (
-                                <div className="text-xs text-red-600 font-medium">Not counted in GPA</div>
+                      {Object.values(gradeGroups)
+                        .sort((a, b) => a.gradeLevel - b.gradeLevel)
+                        .map((gradeGroup, gradeIndex) => {
+                          const gradeKey = `${gradeGroup.gradeLevel}-${gradeGroup.schoolYear}-${semesterGroup.semester}`
+                          const gradeGPA = semesterGPAs[gradeKey]
+                          
+                          return (
+                            <React.Fragment key={gradeIndex}>
+                              {gradeGroup.courses.map((course, courseIndex) => {
+                                const weightedPoints = calculateCoursePoints(course.grade, course.credits, course.hap, true)
+                                const countsForGPA = isGradeCountedForGPA(course.grade)
+                                const countsForCredits = isGradeCountedForCredits(course.grade)
+                                
+                                return (
+                                  <tr key={course.id} className={`hover:bg-gray-50 ${!countsForGPA ? 'bg-yellow-50' : ''}`}>
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                      {course.gradeLevel}
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                      '{course.schoolYear}
+                                    </td>
+                                    <td className="px-4 py-4 text-sm text-gray-900">
+                                      {course.courseTitle}
+                                      {!countsForGPA && (
+                                        <div className="text-xs text-red-600 font-medium">Not counted in GPA</div>
+                                      )}
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                      {getCourseLevelName(course.hap)}
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                        ['A+', 'A', 'A-'].includes(course.grade) ? 'bg-green-100 text-green-800' :
+                                        ['B+', 'B', 'B-'].includes(course.grade) ? 'bg-blue-100 text-blue-800' :
+                                        ['C+', 'C', 'C-'].includes(course.grade) ? 'bg-yellow-100 text-yellow-800' :
+                                        course.grade === 'IP' ? 'bg-orange-100 text-orange-800' :
+                                        course.grade === 'P' ? 'bg-purple-100 text-purple-800' :
+                                        'bg-red-100 text-red-800'
+                                      }`}>
+                                        {course.grade}
+                                      </span>
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                      {countsForCredits ? course.credits : (course.credits ? `${course.credits} (NC)` : '')}
+                                    </td>
+                                    <td className="px-4 py-4 text-sm text-gray-900">
+                                      {course.school}
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                                      <div className="flex space-x-2">
+                                        <button
+                                          onClick={() => handleEdit(course)}
+                                          className="text-primary-600 hover:text-primary-900"
+                                        >
+                                          <Edit2 className="h-4 w-4" />
+                                        </button>
+                                        <button
+                                          onClick={() => deleteCourse(course.id)}
+                                          className="text-red-600 hover:text-red-900"
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )
+                              })}
+                              {/* Semester GPA Row for this grade level */}
+                              {gradeGPA && (
+                                <tr className="bg-blue-50">
+                                  <td colSpan="8" className="px-4 py-2 text-sm font-medium text-blue-900">
+                                    Sem. GPA (Weighted) for Grade {gradeGroup.gradeLevel}: {gradeGPA.gpa.toFixed(2)}
+                                  </td>
+                                </tr>
                               )}
-                            </td>
-                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {getCourseLevelName(course.hap)}
-                            </td>
-                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                ['A+', 'A', 'A-'].includes(course.grade) ? 'bg-green-100 text-green-800' :
-                                ['B+', 'B', 'B-'].includes(course.grade) ? 'bg-blue-100 text-blue-800' :
-                                ['C+', 'C', 'C-'].includes(course.grade) ? 'bg-yellow-100 text-yellow-800' :
-                                course.grade === 'IP' ? 'bg-orange-100 text-orange-800' :
-                                course.grade === 'P' ? 'bg-purple-100 text-purple-800' :
-                                'bg-red-100 text-red-800'
-                              }`}>
-                                {course.grade}
-                              </span>
-                            </td>
-                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {countsForCredits ? course.credits : `${course.credits} (NC)`}
-                            </td>
-                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {countsForGPA ? weightedPoints.toFixed(2) : '0.00 (NC)'}
-                            </td>
-                            <td className="px-4 py-4 text-sm text-gray-900">
-                              {course.school}
-                            </td>
-                            <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                              <div className="flex space-x-2">
-                                <button
-                                  onClick={() => handleEdit(course)}
-                                  className="text-primary-600 hover:text-primary-900"
-                                >
-                                  <Edit2 className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={() => deleteCourse(course.id)}
-                                  className="text-red-600 hover:text-red-900"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        )
-                      })}
+                            </React.Fragment>
+                          )
+                        })}
                     </tbody>
                   </table>
                 </div>
