@@ -1,9 +1,20 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTranscript } from '../context/TranscriptContext'
-import { Plus, Trash2, Edit2 } from 'lucide-react'
+import { Plus, Trash2, Edit2, Calculator } from 'lucide-react'
+import { 
+  calculateGPA, 
+  calculateSemesterGPA, 
+  calculateYearlyGPA,
+  calculateCoursePoints,
+  getGradePoints,
+  validateCourse,
+  COURSE_LEVELS,
+  SCHOOL_OPTIONS,
+  getCourseLevelName
+} from '../utils/gpaCalculator'
 
 const CoursesForm = () => {
-  const { transcriptData, addCourse, updateCourse, deleteCourse } = useTranscript()
+  const { transcriptData, addCourse, updateCourse, deleteCourse, updateTranscriptData } = useTranscript()
   const [isAdding, setIsAdding] = useState(false)
   const [editingCourse, setEditingCourse] = useState(null)
   const [courseForm, setCourseForm] = useState({
@@ -16,6 +27,27 @@ const CoursesForm = () => {
     school: '',
     semester: '1st'
   })
+  const [gpaData, setGpaData] = useState({
+    weighted: { gpa: 0, totalCredits: 0 },
+    unweighted: { gpa: 0, totalCredits: 0 }
+  })
+
+  // Calculate GPA whenever courses change
+  useEffect(() => {
+    const weightedGPA = calculateGPA(transcriptData.courses, true)
+    const unweightedGPA = calculateGPA(transcriptData.courses, false)
+    
+    setGpaData({
+      weighted: weightedGPA,
+      unweighted: unweightedGPA
+    })
+
+    // Update transcript data with calculated GPA
+    updateTranscriptData({
+      cumulativeGPA: weightedGPA.gpa.toFixed(3),
+      totalCredits: weightedGPA.totalCredits.toString()
+    })
+  }, [transcriptData.courses, updateTranscriptData])
 
   const resetForm = () => {
     setCourseForm({
@@ -34,6 +66,14 @@ const CoursesForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    
+    // Validate course data
+    const validation = validateCourse(courseForm)
+    if (!validation.isValid) {
+      alert('Please fix the following errors:\n' + validation.errors.join('\n'))
+      return
+    }
+
     if (editingCourse) {
       updateCourse(editingCourse.id, courseForm)
     } else {
@@ -48,20 +88,48 @@ const CoursesForm = () => {
     setIsAdding(true)
   }
 
-  const calculateTotalCredits = () => {
-    return transcriptData.courses.reduce((total, course) => {
-      return total + (parseFloat(course.credits) || 0)
-    }, 0)
+  const gradeOptions = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'P', 'IP', 'S', 'H']
+
+  // Calculate weighted points for current form
+  const getCurrentCoursePoints = () => {
+    if (courseForm.grade && courseForm.credits && courseForm.hap !== undefined) {
+      return calculateCoursePoints(courseForm.grade, courseForm.credits, courseForm.hap, true)
+    }
+    return 0
   }
 
-  const gradeOptions = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'F', 'P', 'IP', 'S', 'H']
-  const hapOptions = ['AP', 'H', 'CL', '']
-  const schoolOptions = [
-    'Legend College Preparatory',
-    'Leigh High School',
-    'Foothill College',
-    'De Anza College'
-  ]
+  const getCurrentGradePoints = () => {
+    if (courseForm.grade && courseForm.hap !== undefined) {
+      return getGradePoints(courseForm.grade, courseForm.hap, true)
+    }
+    return 0
+  }
+
+  // Group courses by semester for display
+  const groupCoursesBySemester = () => {
+    const grouped = {}
+    transcriptData.courses.forEach(course => {
+      const key = `${course.gradeLevel}-${course.schoolYear}-${course.semester}`
+      if (!grouped[key]) {
+        grouped[key] = {
+          gradeLevel: course.gradeLevel,
+          schoolYear: course.schoolYear,
+          semester: course.semester,
+          courses: []
+        }
+      }
+      grouped[key].courses.push(course)
+    })
+    return Object.values(grouped).sort((a, b) => {
+      if (a.gradeLevel !== b.gradeLevel) return a.gradeLevel - b.gradeLevel
+      if (a.schoolYear !== b.schoolYear) return a.schoolYear.localeCompare(b.schoolYear)
+      return a.semester.localeCompare(b.semester)
+    })
+  }
+
+  const semesterGroups = groupCoursesBySemester()
+  const semesterGPAs = calculateSemesterGPA(transcriptData.courses, true)
+  const yearlyGPAs = calculateYearlyGPA(transcriptData.courses, true)
 
   return (
     <div className="space-y-6">
@@ -74,6 +142,31 @@ const CoursesForm = () => {
           <Plus className="h-4 w-4" />
           <span>Add Course</span>
         </button>
+      </div>
+
+      {/* GPA Summary */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center space-x-2 mb-2">
+            <Calculator className="h-5 w-5 text-blue-600" />
+            <h4 className="font-medium text-blue-900">Weighted GPA</h4>
+          </div>
+          <div className="text-2xl font-bold text-blue-900">{gpaData.weighted.gpa.toFixed(3)}</div>
+          <div className="text-sm text-blue-700">
+            {gpaData.weighted.totalCredits} total credits • {gpaData.weighted.courseCount} courses
+          </div>
+        </div>
+        
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-center space-x-2 mb-2">
+            <Calculator className="h-5 w-5 text-green-600" />
+            <h4 className="font-medium text-green-900">Unweighted GPA</h4>
+          </div>
+          <div className="text-2xl font-bold text-green-900">{gpaData.unweighted.gpa.toFixed(3)}</div>
+          <div className="text-sm text-green-700">
+            Standard 4.0 scale
+          </div>
+        </div>
       </div>
 
       {/* Add/Edit Course Form */}
@@ -142,16 +235,15 @@ const CoursesForm = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  H/AP
+                  Course Level
                 </label>
                 <select
                   value={courseForm.hap}
                   onChange={(e) => setCourseForm(prev => ({ ...prev, hap: e.target.value }))}
                   className="input-field"
                 >
-                  <option value="">None</option>
-                  {hapOptions.filter(h => h).map(hap => (
-                    <option key={hap} value={hap}>{hap}</option>
+                  {COURSE_LEVELS.map(level => (
+                    <option key={level.value} value={level.value}>{level.label}</option>
                   ))}
                 </select>
               </div>
@@ -177,7 +269,7 @@ const CoursesForm = () => {
                 </label>
                 <input
                   type="number"
-                  step="1"
+                  step="0.5"
                   min="0"
                   value={courseForm.credits}
                   onChange={(e) => setCourseForm(prev => ({ ...prev, credits: e.target.value }))}
@@ -197,12 +289,24 @@ const CoursesForm = () => {
                   required
                 >
                   <option value="">Select School</option>
-                  {schoolOptions.map(school => (
+                  {SCHOOL_OPTIONS.map(school => (
                     <option key={school} value={school}>{school}</option>
                   ))}
                 </select>
               </div>
             </div>
+
+            {/* Real-time calculation preview */}
+            {courseForm.grade && courseForm.credits && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <div className="text-sm text-blue-900">
+                  <strong>Course Preview:</strong> {getCourseLevelName(courseForm.hap)} • 
+                  Grade Points: {getCurrentGradePoints().toFixed(2)} • 
+                  Weighted Points: {getCurrentCoursePoints().toFixed(2)}
+                </div>
+              </div>
+            )}
+
             <div className="flex space-x-3">
               <button type="submit" className="btn-primary">
                 {editingCourse ? 'Update Course' : 'Add Course'}
@@ -215,105 +319,134 @@ const CoursesForm = () => {
         </div>
       )}
 
-      {/* Courses List */}
+      {/* Courses List by Semester */}
       {transcriptData.courses.length > 0 ? (
-        <div className="space-y-4">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Semester
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Grade
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Year
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Course Title
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    H/AP
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Grade
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Credits
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    School
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {transcriptData.courses.map((course) => (
-                  <tr key={course.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {course.semester}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {course.gradeLevel}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {course.schoolYear}
-                    </td>
-                    <td className="px-4 py-4 text-sm text-gray-900">
-                      {course.courseTitle}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {course.hap}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        ['A+', 'A', 'A-'].includes(course.grade) ? 'bg-green-100 text-green-800' :
-                        ['B+', 'B', 'B-'].includes(course.grade) ? 'bg-blue-100 text-blue-800' :
-                        ['C+', 'C', 'C-'].includes(course.grade) ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {course.grade}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {course.credits}
-                    </td>
-                    <td className="px-4 py-4 text-sm text-gray-900">
-                      {course.school}
-                    </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleEdit(course)}
-                          className="text-primary-600 hover:text-primary-900"
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => deleteCourse(course.id)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+        <div className="space-y-6">
+          {semesterGroups.map((semesterGroup, index) => {
+            const semesterKey = `${semesterGroup.gradeLevel}-${semesterGroup.schoolYear}-${semesterGroup.semester}`
+            const semesterGPA = semesterGPAs[semesterKey]
+            
+            return (
+              <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+                <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-medium text-gray-900">
+                      Grade {semesterGroup.gradeLevel} - {semesterGroup.semester} Semester ({semesterGroup.schoolYear})
+                    </h4>
+                    {semesterGPA && (
+                      <div className="text-sm text-gray-600">
+                        Semester GPA: <span className="font-medium">{semesterGPA.gpa.toFixed(3)}</span> • 
+                        Credits: <span className="font-medium">{semesterGPA.totalCredits}</span>
                       </div>
-                    </td>
-                  </tr>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Course Title
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Level
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Grade
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Credits
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Points
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          School
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {semesterGroup.courses.map((course) => {
+                        const weightedPoints = calculateCoursePoints(course.grade, course.credits, course.hap, true)
+                        
+                        return (
+                          <tr key={course.id} className="hover:bg-gray-50">
+                            <td className="px-4 py-4 text-sm text-gray-900">
+                              {course.courseTitle}
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {getCourseLevelName(course.hap)}
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                ['A+', 'A', 'A-'].includes(course.grade) ? 'bg-green-100 text-green-800' :
+                                ['B+', 'B', 'B-'].includes(course.grade) ? 'bg-blue-100 text-blue-800' :
+                                ['C+', 'C', 'C-'].includes(course.grade) ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-red-100 text-red-800'
+                              }`}>
+                                {course.grade}
+                              </span>
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {course.credits}
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                              {weightedPoints.toFixed(2)}
+                            </td>
+                            <td className="px-4 py-4 text-sm text-gray-900">
+                              {course.school}
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
+                              <div className="flex space-x-2">
+                                <button
+                                  onClick={() => handleEdit(course)}
+                                  className="text-primary-600 hover:text-primary-900"
+                                >
+                                  <Edit2 className="h-4 w-4" />
+                                </button>
+                                <button
+                                  onClick={() => deleteCourse(course.id)}
+                                  className="text-red-600 hover:text-red-900"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )
+          })}
+
+          {/* Yearly GPA Summary */}
+          {Object.keys(yearlyGPAs).length > 0 && (
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h4 className="text-md font-medium text-gray-900 mb-3">Academic Year Summary</h4>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Object.values(yearlyGPAs).map((yearData, index) => (
+                  <div key={index} className="bg-white rounded border p-3">
+                    <div className="text-sm font-medium text-gray-900">
+                      Grade {yearData.gradeLevel} ({yearData.schoolYear})
+                    </div>
+                    <div className="text-lg font-bold text-primary-600">
+                      {yearData.gpa.toFixed(3)}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {yearData.totalCredits} credits • {yearData.courseCount} courses
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* Summary */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-700">Total Credits:</span>
-              <span className="text-lg font-bold text-gray-900">{calculateTotalCredits()}</span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       ) : (
         <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
@@ -321,7 +454,7 @@ const CoursesForm = () => {
             <Plus className="h-12 w-12 mx-auto" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No courses added yet</h3>
-          <p className="text-gray-600 mb-4">Add courses to build the academic record.</p>
+          <p className="text-gray-600 mb-4">Add courses to build the academic record and calculate GPA.</p>
           <button
             onClick={() => setIsAdding(true)}
             className="btn-primary"

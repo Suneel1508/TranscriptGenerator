@@ -3,8 +3,9 @@ import StudentInfoForm from '../components/StudentInfoForm'
 import CoursesForm from '../components/CoursesForm'
 import FilesUpload from '../components/FilesUpload'
 import TranscriptPreview from '../components/TranscriptPreview'
+import GPASummary from '../components/GPASummary'
 import { useTranscript } from '../context/TranscriptContext'
-import { Save, Download, Eye, EyeOff, Plus } from 'lucide-react'
+import { Save, Download, Eye, EyeOff, Plus, Calculator } from 'lucide-react'
 import { generatePDF } from '../utils/pdfGenerator'
 import { useNavigate } from 'react-router-dom'
 
@@ -19,6 +20,7 @@ const TranscriptForm = () => {
   const tabs = [
     { id: 'student', label: 'Student Info', component: StudentInfoForm },
     { id: 'courses', label: 'Courses & Grades', component: CoursesForm },
+    { id: 'gpa', label: 'GPA Summary', component: () => <GPASummary courses={transcriptData.courses} /> },
     { id: 'files', label: 'Files & Assets', component: FilesUpload }
   ]
 
@@ -64,7 +66,7 @@ const TranscriptForm = () => {
               {currentTranscriptId ? 'Edit Transcript' : 'Create Transcript'}
             </h1>
             <p className="text-gray-600">
-              Fill out the form below to generate a professional academic transcript.
+              Fill out the form below to generate a professional academic transcript with automatic GPA calculations.
             </p>
           </div>
           {currentTranscriptId && (
@@ -129,13 +131,14 @@ const TranscriptForm = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors ${
+                  className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors flex items-center space-x-2 ${
                     activeTab === tab.id
                       ? 'border-primary-500 text-primary-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
-                  {tab.label}
+                  {tab.id === 'gpa' && <Calculator className="h-4 w-4" />}
+                  <span>{tab.label}</span>
                 </button>
               ))}
             </nav>
