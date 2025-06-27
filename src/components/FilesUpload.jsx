@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useTranscript } from '../context/TranscriptContext'
 import { Upload, X, Image, FileText, PenTool } from 'lucide-react'
@@ -6,17 +6,53 @@ import { Upload, X, Image, FileText, PenTool } from 'lucide-react'
 const FilesUpload = () => {
   const { transcriptData, updateTranscriptData } = useTranscript()
 
+  // Prevent default drag behaviors on the entire document
+  useEffect(() => {
+    const preventDefaults = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    const handleDrop = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+
+    // Add event listeners to prevent default drag/drop behavior
+    document.addEventListener('dragenter', preventDefaults, false)
+    document.addEventListener('dragleave', preventDefaults, false)
+    document.addEventListener('dragover', preventDefaults, false)
+    document.addEventListener('drop', handleDrop, false)
+
+    return () => {
+      document.removeEventListener('dragenter', preventDefaults, false)
+      document.removeEventListener('dragleave', preventDefaults, false)
+      document.removeEventListener('dragover', preventDefaults, false)
+      document.removeEventListener('drop', handleDrop, false)
+    }
+  }, [])
+
   const createFileUploader = (fileType, maxSize = 5 * 1024 * 1024) => {
-    return useCallback((acceptedFiles) => {
+    return useCallback((acceptedFiles, rejectedFiles) => {
+      console.log('Files dropped:', acceptedFiles, rejectedFiles)
+      
+      if (rejectedFiles.length > 0) {
+        const rejection = rejectedFiles[0]
+        if (rejection.errors.some(error => error.code === 'file-too-large')) {
+          alert(`File size must be less than ${maxSize / (1024 * 1024)}MB`)
+        } else if (rejection.errors.some(error => error.code === 'file-invalid-type')) {
+          alert('Please upload only image files (JPEG, PNG, GIF)')
+        }
+        return
+      }
+
       const file = acceptedFiles[0]
       if (file) {
-        if (file.size > maxSize) {
-          alert(`File size must be less than ${maxSize / (1024 * 1024)}MB`)
-          return
-        }
+        console.log('Processing file:', file.name, file.type, file.size)
         
         const reader = new FileReader()
         reader.onload = () => {
+          console.log('File read successfully for:', fileType)
           updateTranscriptData({
             [fileType]: {
               file,
@@ -25,6 +61,10 @@ const FilesUpload = () => {
               size: file.size
             }
           })
+        }
+        reader.onerror = () => {
+          console.error('Error reading file')
+          alert('Error reading file. Please try again.')
         }
         reader.readAsDataURL(file)
       }
@@ -40,7 +80,8 @@ const FilesUpload = () => {
     multiple: false,
     noClick: false,
     noKeyboard: false,
-    preventDropOnDocument: true
+    preventDropOnDocument: true,
+    maxSize: 2 * 1024 * 1024
   })
 
   const stampDropzone = useDropzone({
@@ -52,7 +93,8 @@ const FilesUpload = () => {
     multiple: false,
     noClick: false,
     noKeyboard: false,
-    preventDropOnDocument: true
+    preventDropOnDocument: true,
+    maxSize: 5 * 1024 * 1024
   })
 
   const signatureDropzone = useDropzone({
@@ -64,7 +106,8 @@ const FilesUpload = () => {
     multiple: false,
     noClick: false,
     noKeyboard: false,
-    preventDropOnDocument: true
+    preventDropOnDocument: true,
+    maxSize: 5 * 1024 * 1024
   })
 
   const removeFile = (fileType) => {
@@ -116,6 +159,18 @@ const FilesUpload = () => {
               : 'border-gray-300 hover:border-gray-400'
           }`}
           style={{ minHeight: '120px' }}
+          onDragEnter={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}
+          onDragOver={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}
+          onDrop={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}
         >
           <input {...dropzone.getInputProps()} />
           <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
