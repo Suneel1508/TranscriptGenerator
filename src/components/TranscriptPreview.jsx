@@ -108,55 +108,66 @@ const TranscriptPreview = () => {
         </table>
       </div>
 
-      {/* Credit Summary - CLEAN FORMAT */}
+      {/* Credit Summary - FIXED FORMAT - Single Line Per Subject */}
       <div style={{ marginBottom: '15px' }}>
         <div style={{ backgroundColor: '#e8e8e8', border: '2px solid black', borderBottom: '1px solid black', padding: '4px 8px', fontWeight: 'bold', fontSize: '10px' }}>
           Credit Summary<br />
           Curriculum Track: College Prep, Honors
         </div>
         <div style={{ border: '2px solid black', borderTop: 'none', padding: '8px', fontSize: '9px' }}>
-          <div style={{ display: 'flex', marginBottom: '8px' }}>
-            <div style={{ width: '25%', paddingRight: '8px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>History/Social Science</div>
-              <div>Earned: {transcriptData.creditSummary[0]?.earned || 25}</div>
-              <div>Required: {transcriptData.creditSummary[0]?.required || 30}</div>
+          {/* First Row */}
+          <div style={{ display: 'flex', marginBottom: '4px' }}>
+            <div style={{ width: '50%', paddingRight: '8px' }}>
+              <span style={{ fontWeight: 'bold' }}>History/Social Science</span>
+              <span style={{ marginLeft: '8px' }}>Earned: {transcriptData.creditSummary[0]?.earned || 25}</span>
+              <span style={{ marginLeft: '8px' }}>Required: {transcriptData.creditSummary[0]?.required || 30}</span>
             </div>
-            <div style={{ width: '25%', paddingRight: '8px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>English</div>
-              <div>Earned: {transcriptData.creditSummary[1]?.earned || 25}</div>
-              <div>Required: {transcriptData.creditSummary[1]?.required || 40}</div>
-            </div>
-            <div style={{ width: '25%', paddingRight: '8px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Mathematics</div>
-              <div>Earned: {transcriptData.creditSummary[2]?.earned || 45}</div>
-              <div>Required: {transcriptData.creditSummary[2]?.required || 40}</div>
-            </div>
-            <div style={{ width: '25%' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Laboratory Science</div>
-              <div>Earned: {transcriptData.creditSummary[3]?.earned || 35}</div>
-              <div>Required: {transcriptData.creditSummary[3]?.required || 30}</div>
+            <div style={{ width: '50%' }}>
+              <span style={{ fontWeight: 'bold' }}>English</span>
+              <span style={{ marginLeft: '8px' }}>Earned: {transcriptData.creditSummary[1]?.earned || 25}</span>
+              <span style={{ marginLeft: '8px' }}>Required: {transcriptData.creditSummary[1]?.required || 40}</span>
             </div>
           </div>
+          
+          {/* Second Row */}
+          <div style={{ display: 'flex', marginBottom: '4px' }}>
+            <div style={{ width: '50%', paddingRight: '8px' }}>
+              <span style={{ fontWeight: 'bold' }}>Mathematics</span>
+              <span style={{ marginLeft: '8px' }}>Earned: {transcriptData.creditSummary[2]?.earned || 45}</span>
+              <span style={{ marginLeft: '8px' }}>Required: {transcriptData.creditSummary[2]?.required || 40}</span>
+            </div>
+            <div style={{ width: '50%' }}>
+              <span style={{ fontWeight: 'bold' }}>Laboratory Science</span>
+              <span style={{ marginLeft: '8px' }}>Earned: {transcriptData.creditSummary[3]?.earned || 35}</span>
+              <span style={{ marginLeft: '8px' }}>Required: {transcriptData.creditSummary[3]?.required || 30}</span>
+            </div>
+          </div>
+          
+          {/* Third Row */}
+          <div style={{ display: 'flex', marginBottom: '4px' }}>
+            <div style={{ width: '50%', paddingRight: '8px' }}>
+              <span style={{ fontWeight: 'bold' }}>Foreign Language</span>
+              <span style={{ marginLeft: '8px' }}>Earned: {transcriptData.creditSummary[4]?.earned || 10}</span>
+              <span style={{ marginLeft: '8px' }}>Required: {transcriptData.creditSummary[4]?.required || 20}</span>
+            </div>
+            <div style={{ width: '50%' }}>
+              <span style={{ fontWeight: 'bold' }}>Arts</span>
+              <span style={{ marginLeft: '8px' }}>Earned: {transcriptData.creditSummary[5]?.earned || 10}</span>
+              <span style={{ marginLeft: '8px' }}>Required: {transcriptData.creditSummary[5]?.required || 20}</span>
+            </div>
+          </div>
+          
+          {/* Fourth Row */}
           <div style={{ display: 'flex' }}>
-            <div style={{ width: '25%', paddingRight: '8px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Foreign Language</div>
-              <div>Earned: {transcriptData.creditSummary[4]?.earned || 10}</div>
-              <div>Required: {transcriptData.creditSummary[4]?.required || 20}</div>
+            <div style={{ width: '50%', paddingRight: '8px' }}>
+              <span style={{ fontWeight: 'bold' }}>Elective</span>
+              <span style={{ marginLeft: '8px' }}>Earned: {transcriptData.creditSummary[6]?.earned || 60}</span>
+              <span style={{ marginLeft: '8px' }}>Required: {transcriptData.creditSummary[6]?.required || 70}</span>
             </div>
-            <div style={{ width: '25%', paddingRight: '8px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Arts</div>
-              <div>Earned: {transcriptData.creditSummary[5]?.earned || 10}</div>
-              <div>Required: {transcriptData.creditSummary[5]?.required || 20}</div>
-            </div>
-            <div style={{ width: '25%', paddingRight: '8px' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Elective</div>
-              <div>Earned: {transcriptData.creditSummary[6]?.earned || 60}</div>
-              <div>Required: {transcriptData.creditSummary[6]?.required || 70}</div>
-            </div>
-            <div style={{ width: '25%' }}>
-              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Physical Education</div>
-              <div>Earned: {transcriptData.creditSummary[7]?.earned || 20}</div>
-              <div>Required: {transcriptData.creditSummary[7]?.required || 10}</div>
+            <div style={{ width: '50%' }}>
+              <span style={{ fontWeight: 'bold' }}>Physical Education</span>
+              <span style={{ marginLeft: '8px' }}>Earned: {transcriptData.creditSummary[7]?.earned || 20}</span>
+              <span style={{ marginLeft: '8px' }}>Required: {transcriptData.creditSummary[7]?.required || 10}</span>
             </div>
           </div>
         </div>
@@ -252,7 +263,7 @@ const TranscriptPreview = () => {
                                         <td style={{ padding: '2px 4px', width: '30%' }}>{isGradeCountedForGPA(course.grade) ? course.credits : ''}</td>
                                       </tr>
                                     ))}
-                                    {/* Semester GPA */}
+                                    {/* Semester GPA - FIXED */}
                                     <tr style={{ borderTop: '1px solid black', backgroundColor: '#f9f9f9' }}>
                                       <td colSpan="4" style={{ padding: '3px 4px', fontWeight: 'bold', fontSize: '8px' }}>
                                         Sem. GPA (Weighted): {firstSemGPA ? firstSemGPA.gpa.toFixed(2) : '0.00'}
@@ -277,7 +288,7 @@ const TranscriptPreview = () => {
                                         <td style={{ padding: '2px 4px', width: '30%' }}>{isGradeCountedForGPA(course.grade) ? course.credits : ''}</td>
                                       </tr>
                                     ))}
-                                    {/* Semester GPA */}
+                                    {/* Semester GPA - FIXED */}
                                     <tr style={{ borderTop: '1px solid black', backgroundColor: '#f9f9f9' }}>
                                       <td colSpan="4" style={{ padding: '3px 4px', fontWeight: 'bold', fontSize: '8px' }}>
                                         Sem. GPA (Weighted): {secondSemGPA ? secondSemGPA.gpa.toFixed(2) : ''}
