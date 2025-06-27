@@ -260,6 +260,7 @@ export const validateCourse = (course) => {
     errors.push('Invalid grade')
   }
   
+  // Only require credits for non-IP grades OR allow credits for all grades
   const credits = parseFloat(course.credits)
   if (!course.credits || isNaN(credits) || credits <= 0) {
     errors.push('Valid credits are required')
