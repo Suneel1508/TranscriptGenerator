@@ -6,7 +6,7 @@ import { Upload, X, Image, FileText, PenTool } from 'lucide-react'
 const FilesUpload = () => {
   const { transcriptData, updateTranscriptData } = useTranscript()
 
-  const createFileUploader = (fileType, accept, maxSize = 5 * 1024 * 1024) => {
+  const createFileUploader = (fileType, maxSize = 5 * 1024 * 1024) => {
     return useCallback((acceptedFiles) => {
       const file = acceptedFiles[0]
       if (file) {
@@ -32,30 +32,36 @@ const FilesUpload = () => {
   }
 
   const photoDropzone = useDropzone({
-    onDrop: createFileUploader('photo', 'image/*', 2 * 1024 * 1024),
+    onDrop: createFileUploader('photo', 2 * 1024 * 1024),
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png', '.gif']
     },
     maxFiles: 1,
-    multiple: false
+    multiple: false,
+    noClick: false,
+    noKeyboard: false
   })
 
   const stampDropzone = useDropzone({
-    onDrop: createFileUploader('digitalStamp', 'image/*'),
+    onDrop: createFileUploader('digitalStamp'),
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png', '.gif']
     },
     maxFiles: 1,
-    multiple: false
+    multiple: false,
+    noClick: false,
+    noKeyboard: false
   })
 
   const signatureDropzone = useDropzone({
-    onDrop: createFileUploader('signature', 'image/*'),
+    onDrop: createFileUploader('signature'),
     accept: {
       'image/*': ['.jpeg', '.jpg', '.png', '.gif']
     },
     maxFiles: 1,
-    multiple: false
+    multiple: false,
+    noClick: false,
+    noKeyboard: false
   })
 
   const removeFile = (fileType) => {
@@ -91,6 +97,7 @@ const FilesUpload = () => {
               <button
                 onClick={() => removeFile(fileType)}
                 className="text-red-600 hover:text-red-800"
+                type="button"
               >
                 <X className="h-5 w-5" />
               </button>
