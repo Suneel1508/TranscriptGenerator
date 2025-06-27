@@ -238,48 +238,50 @@ const TranscriptPreview = () => {
         </div>
       )}
 
-      {/* Signature Section */}
-      <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        <div style={{ width: '60%' }}>
-          {transcriptData.comments && (
-            <div>
-              <div style={{ fontWeight: 'bold', marginBottom: '5px', fontSize: '10px' }}>Comments:</div>
-              <div style={{ border: '1px solid black', padding: '8px', minHeight: '60px', fontSize: '9px' }}>
-                {transcriptData.comments}
-              </div>
-            </div>
-          )}
-        </div>
-        
-        <div style={{ width: '35%', textAlign: 'center' }}>
-          {/* Digital Stamp */}
-          {transcriptData.digitalStamp && (
-            <div style={{ marginBottom: '10px' }}>
-              <img
-                src={transcriptData.digitalStamp.preview}
-                alt="Official Stamp"
-                style={{ height: '50px', margin: '0 auto' }}
-              />
-            </div>
-          )}
-          
-          {/* Principal Signature */}
-          <div style={{ marginTop: '20px' }}>
-            {transcriptData.signature && (
-              <div style={{ marginBottom: '5px' }}>
-                <img
-                  src={transcriptData.signature.preview}
-                  alt="Principal Signature"
-                  style={{ height: '30px', margin: '0 auto' }}
-                />
-              </div>
-            )}
-            <div style={{ borderTop: '1px solid black', paddingTop: '3px', fontSize: '9px' }}>
-              <div>Principal: {transcriptData.principalName || 'Principal Name'}</div>
-              <div>Date: {formatDate(transcriptData.dateSigned) || formatDate(new Date().toISOString().split('T')[0])}</div>
-            </div>
-          </div>
-        </div>
+      {/* Comments and Signature Section */}
+      <div style={{ marginTop: '30px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <tbody>
+            <tr>
+              <td style={{ border: '1px solid black', padding: '8px', width: '60%', verticalAlign: 'top' }}>
+                <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '10px' }}>Comments</div>
+                <div style={{ fontSize: '9px', minHeight: '80px' }}>
+                  {transcriptData.comments || 'UNOFFICIAL TRANSCRIPT\nCL-College Level\nIP- In Progress\nP- Pass\nF- Fail'}
+                </div>
+                
+                {/* Digital Stamp in Comments Section */}
+                {transcriptData.digitalStamp && (
+                  <div style={{ marginTop: '15px', textAlign: 'center' }}>
+                    <img
+                      src={transcriptData.digitalStamp.preview}
+                      alt="Official Stamp"
+                      style={{ height: '80px', maxWidth: '120px', objectFit: 'contain' }}
+                    />
+                  </div>
+                )}
+              </td>
+              
+              <td style={{ border: '1px solid black', padding: '8px', width: '40%', verticalAlign: 'top', textAlign: 'center' }}>
+                {/* Principal Signature - Enlarged */}
+                <div style={{ marginTop: '20px' }}>
+                  {transcriptData.signature && (
+                    <div style={{ marginBottom: '10px' }}>
+                      <img
+                        src={transcriptData.signature.preview}
+                        alt="Principal Signature"
+                        style={{ height: '60px', maxWidth: '150px', margin: '0 auto', objectFit: 'contain' }}
+                      />
+                    </div>
+                  )}
+                  <div style={{ borderTop: '1px solid black', paddingTop: '5px', fontSize: '9px' }}>
+                    <div>Principal Signature: {transcriptData.principalName || 'Principal Name'}</div>
+                    <div>Date: {formatDate(transcriptData.dateSigned) || 'January 31, 2019'}</div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   )

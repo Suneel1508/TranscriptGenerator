@@ -1,12 +1,11 @@
 import React, { useRef } from 'react'
 import { useTranscript } from '../context/TranscriptContext'
-import { Upload, X, Image, FileText, PenTool } from 'lucide-react'
+import { Upload, X, FileText, PenTool } from 'lucide-react'
 
 const FilesUpload = () => {
   const { transcriptData, updateTranscriptData } = useTranscript()
   
   // Create refs for file inputs
-  const photoInputRef = useRef(null)
   const stampInputRef = useRef(null)
   const signatureInputRef = useRef(null)
 
@@ -136,16 +135,6 @@ const FilesUpload = () => {
       
       <div className="grid md:grid-cols-1 gap-8">
         <FileUploadArea
-          title="Student Photo"
-          description="Upload a passport-style photo (JPEG, PNG, max 2MB)"
-          icon={Image}
-          fileData={transcriptData.photo}
-          fileType="photo"
-          inputRef={photoInputRef}
-          maxSize={2 * 1024 * 1024}
-        />
-        
-        <FileUploadArea
           title="Digital Stamp"
           description="Upload institutional stamp or seal (JPEG, PNG, max 5MB)"
           icon={FileText}
@@ -169,7 +158,6 @@ const FilesUpload = () => {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h4 className="text-sm font-medium text-blue-900 mb-2">File Requirements</h4>
         <ul className="text-sm text-blue-800 space-y-1">
-          <li>• Student photo should be passport-style (2x2 cm recommended)</li>
           <li>• Digital stamp should be the official institutional seal</li>
           <li>• Signature should be from an authorized academic official</li>
           <li>• All images should have transparent backgrounds when possible</li>
