@@ -39,7 +39,8 @@ const FilesUpload = () => {
     maxFiles: 1,
     multiple: false,
     noClick: false,
-    noKeyboard: false
+    noKeyboard: false,
+    preventDropOnDocument: true
   })
 
   const stampDropzone = useDropzone({
@@ -50,7 +51,8 @@ const FilesUpload = () => {
     maxFiles: 1,
     multiple: false,
     noClick: false,
-    noKeyboard: false
+    noKeyboard: false,
+    preventDropOnDocument: true
   })
 
   const signatureDropzone = useDropzone({
@@ -61,7 +63,8 @@ const FilesUpload = () => {
     maxFiles: 1,
     multiple: false,
     noClick: false,
-    noKeyboard: false
+    noKeyboard: false,
+    preventDropOnDocument: true
   })
 
   const removeFile = (fileType) => {
@@ -112,6 +115,7 @@ const FilesUpload = () => {
               ? 'border-primary-400 bg-primary-50'
               : 'border-gray-300 hover:border-gray-400'
           }`}
+          style={{ minHeight: '120px' }}
         >
           <input {...dropzone.getInputProps()} />
           <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />

@@ -6,6 +6,7 @@ import {
   deleteTranscript as deleteTranscriptFromSupabase,
   getTranscriptsBySSN 
 } from '../lib/supabase'
+import { uploadTranscriptFiles } from '../lib/fileStorage'
 
 const TranscriptContext = createContext()
 
@@ -158,9 +159,32 @@ const TranscriptProvider = ({ children }) => {
     try {
       setIsLoading(true)
       
+      // Prepare files for upload
+      const filesToUpload = {}
+      if (transcriptData.photo) filesToUpload.photo = transcriptData.photo
+      if (transcriptData.digitalStamp) filesToUpload.digitalStamp = transcriptData.digitalStamp
+      if (transcriptData.signature) filesToUpload.signature = transcriptData.signature
+      
       if (currentTranscriptId) {
         // Update existing transcript
-        const result = await updateTranscript(currentTranscriptId, transcriptData, name)
+        let updatedData = { ...transcriptData }
+        
+        // Upload new files if any
+        if (Object.keys(filesToUpload).length > 0) {
+          const fileResult = await uploadTranscriptFiles(currentTranscriptId, filesToUpload)
+          if (fileResult.success) {
+            // Update file references in transcript data
+            Object.keys(fileResult.files).forEach(fileType => {
+              updatedData[fileType] = {
+                ...updatedData[fileType],
+                url: fileResult.files[fileType].url,
+                path: fileResult.files[fileType].path
+              }
+            })
+          }
+        }
+        
+        const result = await updateTranscript(currentTranscriptId, updatedData, name)
         if (result.success) {
           await loadTranscripts() // Reload transcripts
           return { success: true, transcript: result.transcript }
@@ -170,8 +194,29 @@ const TranscriptProvider = ({ children }) => {
         // Create new transcript
         const result = await saveTranscriptToSupabase(transcriptData, name)
         if (result.success) {
+          const transcriptId = result.transcript.id
+          setCurrentTranscriptId(transcriptId)
+          
+          // Upload files after creating transcript
+          if (Object.keys(filesToUpload).length > 0) {
+            const fileResult = await uploadTranscriptFiles(transcriptId, filesToUpload)
+            if (fileResult.success) {
+              // Update transcript with file URLs
+              let updatedData = { ...transcriptData }
+              Object.keys(fileResult.files).forEach(fileType => {
+                updatedData[fileType] = {
+                  ...updatedData[fileType],
+                  url: fileResult.files[fileType].url,
+                  path: fileResult.files[fileType].path
+                }
+              })
+              
+              // Update the transcript with file references
+              await updateTranscript(transcriptId, updatedData, name)
+            }
+          }
+          
           await loadTranscripts() // Reload transcripts
-          setCurrentTranscriptId(result.transcript.id)
           return { success: true, transcript: result.transcript }
         }
         return { success: false, error: result.error }
