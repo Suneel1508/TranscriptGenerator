@@ -40,135 +40,129 @@ const TranscriptPreview = () => {
         </div>
       </div>
 
-      {/* Student Information - Clean format without internal borders */}
+      {/* Student Information - CLEAN FORMAT WITHOUT INTERNAL BORDERS */}
+      <div style={{ marginBottom: '15px', border: '2px solid black', padding: '8px', fontSize: '10px' }}>
+        <div style={{ display: 'flex', marginBottom: '4px' }}>
+          <span style={{ fontWeight: 'bold', width: '15%' }}>Student Name:</span>
+          <span style={{ width: '35%' }}>{transcriptData.studentName || 'Kondor, Anirud'}</span>
+          <span style={{ fontWeight: 'bold', width: '15%' }}>Student Number:</span>
+          <span style={{ width: '35%' }}>{transcriptData.studentNumber || '11807'}</span>
+        </div>
+        <div style={{ display: 'flex', marginBottom: '4px' }}>
+          <span style={{ fontWeight: 'bold', width: '15%' }}>Address:</span>
+          <span style={{ width: '85%' }}>{transcriptData.address || '4848 Tilden Dr., San Jose, CA 95124'}</span>
+        </div>
+        <div style={{ display: 'flex', marginBottom: '4px' }}>
+          <span style={{ fontWeight: 'bold', width: '15%' }}>Date of Birth:</span>
+          <span style={{ width: '35%' }}>{formatDate(transcriptData.dateOfBirth) || 'April 25, 2002'}</span>
+          <span style={{ fontWeight: 'bold', width: '15%' }}>Gender:</span>
+          <span style={{ width: '35%' }}>{transcriptData.gender || 'Male'}</span>
+        </div>
+        <div style={{ display: 'flex' }}>
+          <span style={{ fontWeight: 'bold', width: '15%' }}>Guardian:</span>
+          <span style={{ width: '35%' }}>{transcriptData.guardian || 'Padman Kondor, Sangeetha Kondor'}</span>
+          <span style={{ fontWeight: 'bold', width: '15%' }}>SSN:</span>
+          <span style={{ width: '35%' }}>{formatSSNForDisplay(transcriptData.ssn)}</span>
+        </div>
+      </div>
+
+      {/* GPA and Credit Summary - CLEAN FORMAT */}
       <div style={{ marginBottom: '15px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', border: '2px solid black' }}>
           <tbody>
             <tr>
-              <td style={{ padding: '4px 8px', fontWeight: 'bold', width: '15%' }}>Student Name:</td>
-              <td style={{ padding: '4px 8px', width: '35%' }}>{transcriptData.studentName || 'Kondor, Anirud'}</td>
-              <td style={{ padding: '4px 8px', fontWeight: 'bold', width: '15%', borderLeft: '1px solid black' }}>Student Number:</td>
-              <td style={{ padding: '4px 8px', width: '35%' }}>{transcriptData.studentNumber || '11807'}</td>
+              <td style={{ padding: '4px 8px', backgroundColor: '#e8e8e8', fontWeight: 'bold', width: '50%', border: 'none' }}>GPA Summary</td>
+              <td style={{ padding: '4px 8px', backgroundColor: '#e8e8e8', fontWeight: 'bold', width: '50%', borderLeft: '1px solid black', border: 'none', borderLeft: '1px solid black' }}>Total Credit Completed</td>
             </tr>
-            <tr style={{ borderTop: '1px solid black' }}>
-              <td style={{ padding: '4px 8px', fontWeight: 'bold' }}>Address:</td>
-              <td style={{ padding: '4px 8px' }} colSpan="3">{transcriptData.address || '4848 Tilden Dr., San Jose, CA 95124'}</td>
-            </tr>
-            <tr style={{ borderTop: '1px solid black' }}>
-              <td style={{ padding: '4px 8px', fontWeight: 'bold' }}>Date of Birth:</td>
-              <td style={{ padding: '4px 8px' }}>{formatDate(transcriptData.dateOfBirth) || 'April 25, 2002'}</td>
-              <td style={{ padding: '4px 8px', fontWeight: 'bold', borderLeft: '1px solid black' }}>Gender:</td>
-              <td style={{ padding: '4px 8px' }}>{transcriptData.gender || 'Male'}</td>
-            </tr>
-            <tr style={{ borderTop: '1px solid black' }}>
-              <td style={{ padding: '4px 8px', fontWeight: 'bold' }}>Guardian:</td>
-              <td style={{ padding: '4px 8px' }}>{transcriptData.guardian || 'Padman Kondor, Sangeetha Kondor'}</td>
-              <td style={{ padding: '4px 8px', fontWeight: 'bold', borderLeft: '1px solid black' }}>SSN:</td>
-              <td style={{ padding: '4px 8px' }}>{formatSSNForDisplay(transcriptData.ssn)}</td>
+            <tr>
+              <td style={{ padding: '4px 8px', border: 'none' }}>Cumulative GPA (Weighted): {transcriptData.cumulativeGPA || '4.33'}</td>
+              <td style={{ padding: '4px 8px', border: 'none', borderLeft: '1px solid black' }}>{transcriptData.totalCredits || '20'} {transcriptData.institutionName || 'Legend College Preparatory'}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      {/* GPA and Credit Summary - Clean format */}
+      {/* Enrollment Summary - CLEAN FORMAT */}
       <div style={{ marginBottom: '15px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', border: '2px solid black' }}>
           <tbody>
             <tr>
-              <td style={{ padding: '4px 8px', backgroundColor: '#e8e8e8', fontWeight: 'bold', width: '50%', borderBottom: '1px solid black' }}>GPA Summary</td>
-              <td style={{ padding: '4px 8px', backgroundColor: '#e8e8e8', fontWeight: 'bold', width: '50%', borderLeft: '1px solid black', borderBottom: '1px solid black' }}>Total Credit Completed</td>
+              <td style={{ padding: '4px 8px', backgroundColor: '#e8e8e8', fontWeight: 'bold', border: 'none' }} colSpan="3">Enrollment Summary</td>
+              <td style={{ padding: '4px 8px', backgroundColor: '#e8e8e8', fontWeight: 'bold', borderLeft: '1px solid black', border: 'none', borderLeft: '1px solid black' }}>Total Credit Transferred</td>
             </tr>
-            <tr>
-              <td style={{ padding: '4px 8px' }}>Cumulative GPA (Weighted): {transcriptData.cumulativeGPA || '4.33'}</td>
-              <td style={{ padding: '4px 8px', borderLeft: '1px solid black' }}>{transcriptData.totalCredits || '20'} {transcriptData.institutionName || 'Legend College Preparatory'}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      {/* Enrollment Summary - Clean format */}
-      <div style={{ marginBottom: '15px' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', border: '2px solid black' }}>
-          <tbody>
-            <tr>
-              <td style={{ padding: '4px 8px', backgroundColor: '#e8e8e8', fontWeight: 'bold', borderBottom: '1px solid black' }} colSpan="3">Enrollment Summary</td>
-              <td style={{ padding: '4px 8px', backgroundColor: '#e8e8e8', fontWeight: 'bold', borderLeft: '1px solid black', borderBottom: '1px solid black' }}>Total Credit Transferred</td>
-            </tr>
-            <tr style={{ backgroundColor: '#f5f5f5', borderBottom: '1px solid black' }}>
-              <td style={{ padding: '3px 8px', fontWeight: 'bold', borderRight: '1px solid black' }}>Start/End Date</td>
-              <td style={{ padding: '3px 8px', fontWeight: 'bold', borderRight: '1px solid black' }}>Grade</td>
-              <td style={{ padding: '3px 8px', fontWeight: 'bold', borderRight: '1px solid black' }}>School</td>
-              <td style={{ padding: '3px 8px' }}></td>
+            <tr style={{ backgroundColor: '#f5f5f5' }}>
+              <td style={{ padding: '3px 8px', fontWeight: 'bold', border: 'none', width: '25%' }}>Start/End Date</td>
+              <td style={{ padding: '3px 8px', fontWeight: 'bold', border: 'none', width: '15%' }}>Grade</td>
+              <td style={{ padding: '3px 8px', fontWeight: 'bold', border: 'none', width: '35%' }}>School</td>
+              <td style={{ padding: '3px 8px', border: 'none', borderLeft: '1px solid black', width: '25%' }}></td>
             </tr>
             {transcriptData.enrollmentSummary.slice(0, 7).map((enrollment, index) => (
-              <tr key={index} style={{ borderBottom: index < 6 ? '1px solid black' : 'none' }}>
-                <td style={{ padding: '3px 8px', borderRight: '1px solid black' }}>{enrollment.startEndDate || (index === 0 ? '2016-2017' : index === 1 ? '2016-2017' : index === 2 ? '2017-2018' : index === 3 ? '2017-2018' : index === 4 ? '2017-2018' : index === 5 ? '2016-2017' : '2016-2017')}</td>
-                <td style={{ padding: '3px 8px', borderRight: '1px solid black' }}>{enrollment.grade || (index === 0 ? '9' : index === 1 ? '9' : index === 2 ? '10' : index === 3 ? '10' : index === 4 ? '10' : index === 5 ? '11' : '11')}</td>
-                <td style={{ padding: '3px 8px', borderRight: '1px solid black' }}>{enrollment.school || (index === 0 ? 'Leigh High School' : index === 1 ? 'Foothill College' : index === 2 ? 'Leigh High School' : index === 3 ? 'Foothill College' : index === 4 ? 'De Anza College' : index === 5 ? 'Legend College Preparatory' : 'Leigh High School')}</td>
-                <td style={{ padding: '3px 8px' }}>{index === 0 ? '150 Leigh High School' : index === 1 ? '30 Foothill College' : index === 2 ? '10 De Anza College' : ''}</td>
+              <tr key={index}>
+                <td style={{ padding: '3px 8px', border: 'none' }}>{enrollment.startEndDate || (index === 0 ? '2016-2017' : index === 1 ? '2016-2017' : index === 2 ? '2017-2018' : index === 3 ? '2017-2018' : index === 4 ? '2017-2018' : index === 5 ? '2016-2017' : '2016-2017')}</td>
+                <td style={{ padding: '3px 8px', border: 'none' }}>{enrollment.grade || (index === 0 ? '9' : index === 1 ? '9' : index === 2 ? '10' : index === 3 ? '10' : index === 4 ? '10' : index === 5 ? '11' : '11')}</td>
+                <td style={{ padding: '3px 8px', border: 'none' }}>{enrollment.school || (index === 0 ? 'Leigh High School' : index === 1 ? 'Foothill College' : index === 2 ? 'Leigh High School' : index === 3 ? 'Foothill College' : index === 4 ? 'De Anza College' : index === 5 ? 'Legend College Preparatory' : 'Leigh High School')}</td>
+                <td style={{ padding: '3px 8px', border: 'none', borderLeft: '1px solid black' }}>{index === 0 ? '150 Leigh High School' : index === 1 ? '30 Foothill College' : index === 2 ? '10 De Anza College' : ''}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* Credit Summary - Clean format */}
+      {/* Credit Summary - CLEAN FORMAT */}
       <div style={{ marginBottom: '15px' }}>
         <div style={{ backgroundColor: '#e8e8e8', border: '2px solid black', borderBottom: '1px solid black', padding: '4px 8px', fontWeight: 'bold', fontSize: '10px' }}>
           Credit Summary<br />
           Curriculum Track: College Prep, Honors
         </div>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px', border: '2px solid black', borderTop: 'none' }}>
-          <tbody>
-            <tr>
-              <td style={{ padding: '6px 8px', width: '25%', borderRight: '1px solid black', borderBottom: '1px solid black' }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>History/Social Science</div>
-                <div>Earned: {transcriptData.creditSummary[0]?.earned || 25}</div>
-                <div>Required: {transcriptData.creditSummary[0]?.required || 30}</div>
-              </td>
-              <td style={{ padding: '6px 8px', width: '25%', borderRight: '1px solid black', borderBottom: '1px solid black' }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>English</div>
-                <div>Earned: {transcriptData.creditSummary[1]?.earned || 25}</div>
-                <div>Required: {transcriptData.creditSummary[1]?.required || 40}</div>
-              </td>
-              <td style={{ padding: '6px 8px', width: '25%', borderRight: '1px solid black', borderBottom: '1px solid black' }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Mathematics</div>
-                <div>Earned: {transcriptData.creditSummary[2]?.earned || 45}</div>
-                <div>Required: {transcriptData.creditSummary[2]?.required || 40}</div>
-              </td>
-              <td style={{ padding: '6px 8px', width: '25%', borderBottom: '1px solid black' }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Laboratory Science</div>
-                <div>Earned: {transcriptData.creditSummary[3]?.earned || 35}</div>
-                <div>Required: {transcriptData.creditSummary[3]?.required || 30}</div>
-              </td>
-            </tr>
-            <tr>
-              <td style={{ padding: '6px 8px', borderRight: '1px solid black' }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Foreign Language</div>
-                <div>Earned: {transcriptData.creditSummary[4]?.earned || 10}</div>
-                <div>Required: {transcriptData.creditSummary[4]?.required || 20}</div>
-              </td>
-              <td style={{ padding: '6px 8px', borderRight: '1px solid black' }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Arts</div>
-                <div>Earned: {transcriptData.creditSummary[5]?.earned || 10}</div>
-                <div>Required: {transcriptData.creditSummary[5]?.required || 20}</div>
-              </td>
-              <td style={{ padding: '6px 8px', borderRight: '1px solid black' }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Elective</div>
-                <div>Earned: {transcriptData.creditSummary[6]?.earned || 60}</div>
-                <div>Required: {transcriptData.creditSummary[6]?.required || 70}</div>
-              </td>
-              <td style={{ padding: '6px 8px' }}>
-                <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Physical Education</div>
-                <div>Earned: {transcriptData.creditSummary[7]?.earned || 20}</div>
-                <div>Required: {transcriptData.creditSummary[7]?.required || 10}</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div style={{ border: '2px solid black', borderTop: 'none', padding: '8px', fontSize: '9px' }}>
+          <div style={{ display: 'flex', marginBottom: '8px' }}>
+            <div style={{ width: '25%', paddingRight: '8px' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>History/Social Science</div>
+              <div>Earned: {transcriptData.creditSummary[0]?.earned || 25}</div>
+              <div>Required: {transcriptData.creditSummary[0]?.required || 30}</div>
+            </div>
+            <div style={{ width: '25%', paddingRight: '8px' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>English</div>
+              <div>Earned: {transcriptData.creditSummary[1]?.earned || 25}</div>
+              <div>Required: {transcriptData.creditSummary[1]?.required || 40}</div>
+            </div>
+            <div style={{ width: '25%', paddingRight: '8px' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Mathematics</div>
+              <div>Earned: {transcriptData.creditSummary[2]?.earned || 45}</div>
+              <div>Required: {transcriptData.creditSummary[2]?.required || 40}</div>
+            </div>
+            <div style={{ width: '25%' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Laboratory Science</div>
+              <div>Earned: {transcriptData.creditSummary[3]?.earned || 35}</div>
+              <div>Required: {transcriptData.creditSummary[3]?.required || 30}</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex' }}>
+            <div style={{ width: '25%', paddingRight: '8px' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Foreign Language</div>
+              <div>Earned: {transcriptData.creditSummary[4]?.earned || 10}</div>
+              <div>Required: {transcriptData.creditSummary[4]?.required || 20}</div>
+            </div>
+            <div style={{ width: '25%', paddingRight: '8px' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Arts</div>
+              <div>Earned: {transcriptData.creditSummary[5]?.earned || 10}</div>
+              <div>Required: {transcriptData.creditSummary[5]?.required || 20}</div>
+            </div>
+            <div style={{ width: '25%', paddingRight: '8px' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Elective</div>
+              <div>Earned: {transcriptData.creditSummary[6]?.earned || 60}</div>
+              <div>Required: {transcriptData.creditSummary[6]?.required || 70}</div>
+            </div>
+            <div style={{ width: '25%' }}>
+              <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>Physical Education</div>
+              <div>Earned: {transcriptData.creditSummary[7]?.earned || 20}</div>
+              <div>Required: {transcriptData.creditSummary[7]?.required || 10}</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Course Records by School - New Format */}
+      {/* Course Records by School - New Format with PROPER BORDERS */}
       {Object.keys(schoolGroups).length > 0 && (
         <div style={{ marginBottom: '20px' }}>
           {Object.entries(schoolGroups).map(([school, semesters], schoolIndex) => {
