@@ -244,7 +244,7 @@ const TranscriptPreview = () => {
                                 <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.hap || ''}</td>
                                 <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.grade}</td>
                                 <td style={{ padding: '2px 4px', border: '1px solid black' }}>
-                                  {isGradeCountedForGPA(course.grade) ? course.credits : ''}
+                                  {course.grade === 'IP' ? '' : course.credits}
                                 </td>
                               </tr>
                             ))}
