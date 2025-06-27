@@ -54,8 +54,36 @@ export const SCHOOL_OPTIONS = [
   'Dublin High School',
   'Happy Academy', 
   'Fallon Middle School',
-  'Las Positas College'
+  'Las Positas College',
+  'Legend College Preparatory',
+  'Leigh High School',
+  'Foothill College',
+  'De Anza College'
 ]
+
+/**
+ * Check if a grade should be included in GPA calculations
+ * @param {string} grade - Letter grade
+ * @returns {boolean} Whether grade counts for GPA
+ */
+export const isGradeCountedForGPA = (grade) => {
+  // IP (In Progress) grades should NOT be counted
+  // P (Pass) grades should be counted for credits but may need special handling
+  const excludedGrades = ['IP', 'S', 'H'] // In Progress, Satisfactory, Honors (non-letter)
+  return grade && !excludedGrades.includes(grade)
+}
+
+/**
+ * Check if a grade should be included in credit calculations
+ * @param {string} grade - Letter grade
+ * @returns {boolean} Whether grade counts for credits
+ */
+export const isGradeCountedForCredits = (grade) => {
+  // IP (In Progress) grades should NOT count for credits
+  // P (Pass) grades should count for credits
+  const excludedGrades = ['IP'] // Only In Progress is excluded from credits
+  return grade && !excludedGrades.includes(grade)
+}
 
 /**
  * Get grade points for a specific grade and course level
@@ -65,7 +93,11 @@ export const SCHOOL_OPTIONS = [
  * @returns {number} Grade points
  */
 export const getGradePoints = (grade, courseLevel = '', weighted = true) => {
-  if (!grade) return 0
+  if (!grade || !isGradeCountedForGPA(grade)) return 0
+  
+  // Handle special grades
+  if (grade === 'P') return weighted ? 4.00 : 4.00 // Pass = 4.0 points
+  if (grade === 'F') return 0.00 // Fail = 0.0 points
   
   if (!weighted) {
     return UNWEIGHTED_SCALE[grade] || 0
@@ -85,6 +117,8 @@ export const getGradePoints = (grade, courseLevel = '', weighted = true) => {
  * @returns {number} Weighted points
  */
 export const calculateCoursePoints = (grade, credits, courseLevel = '', weighted = true) => {
+  if (!isGradeCountedForGPA(grade)) return 0
+  
   const gradePoints = getGradePoints(grade, courseLevel, weighted)
   const courseCredits = parseFloat(credits) || 0
   return gradePoints * courseCredits
@@ -116,14 +150,21 @@ export const calculateGPA = (courses, weighted = true) => {
     const courseLevel = course.hap || ''
 
     // Skip courses without valid grades or credits
-    if (!grade || credits <= 0 || ['P', 'IP', 'S', 'H'].includes(grade)) {
+    if (!grade || credits <= 0) {
       return
     }
 
-    const points = calculateCoursePoints(grade, credits, courseLevel, weighted)
-    totalPoints += points
-    totalCredits += credits
-    validCourses++
+    // Only count credits for courses that should be counted
+    if (isGradeCountedForCredits(grade)) {
+      totalCredits += credits
+      validCourses++
+    }
+
+    // Only count points for courses that should be counted for GPA
+    if (isGradeCountedForGPA(grade)) {
+      const points = calculateCoursePoints(grade, credits, courseLevel, weighted)
+      totalPoints += points
+    }
   })
 
   const gpa = totalCredits > 0 ? totalPoints / totalCredits : 0
@@ -215,7 +256,7 @@ export const validateCourse = (course) => {
   
   if (!course.grade) {
     errors.push('Grade is required')
-  } else if (!Object.keys(UNWEIGHTED_SCALE).includes(course.grade)) {
+  } else if (!Object.keys(UNWEIGHTED_SCALE).includes(course.grade) && !['P', 'IP', 'S', 'H'].includes(course.grade)) {
     errors.push('Invalid grade')
   }
   
@@ -247,4 +288,34 @@ export const getCourseLevelName = (level) => {
     'CL': 'College Level'
   }
   return levelNames[level] || 'Regular'
+}
+
+/**
+ * Group courses by school and semester for transcript display
+ * @param {Array} courses - Array of course objects
+ * @returns {Object} Grouped courses by school
+ */
+export const groupCoursesBySchoolAndSemester = (courses) => {
+  const schoolGroups = {}
+  
+  courses.forEach(course => {
+    const school = course.school || 'Unknown School'
+    if (!schoolGroups[school]) {
+      schoolGroups[school] = {}
+    }
+    
+    const semesterKey = `${course.gradeLevel}-${course.schoolYear}-${course.semester}`
+    if (!schoolGroups[school][semesterKey]) {
+      schoolGroups[school][semesterKey] = {
+        gradeLevel: course.gradeLevel,
+        schoolYear: course.schoolYear,
+        semester: course.semester,
+        courses: []
+      }
+    }
+    
+    schoolGroups[school][semesterKey].courses.push(course)
+  })
+  
+  return schoolGroups
 }

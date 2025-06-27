@@ -10,7 +10,9 @@ import {
   validateCourse,
   COURSE_LEVELS,
   SCHOOL_OPTIONS,
-  getCourseLevelName
+  getCourseLevelName,
+  isGradeCountedForGPA,
+  isGradeCountedForCredits
 } from '../utils/gpaCalculator'
 
 const CoursesForm = () => {
@@ -303,6 +305,12 @@ const CoursesForm = () => {
                   <strong>Course Preview:</strong> {getCourseLevelName(courseForm.hap)} • 
                   Grade Points: {getCurrentGradePoints().toFixed(2)} • 
                   Weighted Points: {getCurrentCoursePoints().toFixed(2)}
+                  {!isGradeCountedForGPA(courseForm.grade) && (
+                    <span className="text-red-600 font-bold"> • NOT COUNTED IN GPA (IP/Special Grade)</span>
+                  )}
+                  {!isGradeCountedForCredits(courseForm.grade) && (
+                    <span className="text-red-600 font-bold"> • NOT COUNTED FOR CREDITS</span>
+                  )}
                 </div>
               </div>
             )}
@@ -372,11 +380,16 @@ const CoursesForm = () => {
                     <tbody className="bg-white divide-y divide-gray-200">
                       {semesterGroup.courses.map((course) => {
                         const weightedPoints = calculateCoursePoints(course.grade, course.credits, course.hap, true)
+                        const countsForGPA = isGradeCountedForGPA(course.grade)
+                        const countsForCredits = isGradeCountedForCredits(course.grade)
                         
                         return (
-                          <tr key={course.id} className="hover:bg-gray-50">
+                          <tr key={course.id} className={`hover:bg-gray-50 ${!countsForGPA ? 'bg-yellow-50' : ''}`}>
                             <td className="px-4 py-4 text-sm text-gray-900">
                               {course.courseTitle}
+                              {!countsForGPA && (
+                                <div className="text-xs text-red-600 font-medium">Not counted in GPA</div>
+                              )}
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                               {getCourseLevelName(course.hap)}
@@ -386,16 +399,18 @@ const CoursesForm = () => {
                                 ['A+', 'A', 'A-'].includes(course.grade) ? 'bg-green-100 text-green-800' :
                                 ['B+', 'B', 'B-'].includes(course.grade) ? 'bg-blue-100 text-blue-800' :
                                 ['C+', 'C', 'C-'].includes(course.grade) ? 'bg-yellow-100 text-yellow-800' :
+                                course.grade === 'IP' ? 'bg-orange-100 text-orange-800' :
+                                course.grade === 'P' ? 'bg-purple-100 text-purple-800' :
                                 'bg-red-100 text-red-800'
                               }`}>
                                 {course.grade}
                               </span>
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {course.credits}
+                              {countsForCredits ? course.credits : `${course.credits} (NC)`}
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                              {weightedPoints.toFixed(2)}
+                              {countsForGPA ? weightedPoints.toFixed(2) : '0.00 (NC)'}
                             </td>
                             <td className="px-4 py-4 text-sm text-gray-900">
                               {course.school}
@@ -447,6 +462,17 @@ const CoursesForm = () => {
               </div>
             </div>
           )}
+
+          {/* Special Grades Legend */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-blue-900 mb-2">Grade Legend</h4>
+            <div className="text-sm text-blue-800 space-y-1">
+              <p>• <strong>IP (In Progress):</strong> Course is ongoing - NOT counted in GPA or credits</p>
+              <p>• <strong>P (Pass):</strong> Passing grade - counts for credits and GPA (4.0 points)</p>
+              <p>• <strong>F (Fail):</strong> Failing grade - counts for credits but 0.0 GPA points</p>
+              <p>• <strong>NC:</strong> Not Counted - shown in parentheses for excluded grades</p>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
