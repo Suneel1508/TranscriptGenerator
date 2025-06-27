@@ -13,8 +13,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export const authenticateAdmin = async (email, password) => {
   try {
     const { data, error } = await supabase.rpc('authenticate_admin', {
-      user_email: email,
-      user_password: password
+      p_email: email,
+      p_password: password
     })
 
     if (error) throw error
