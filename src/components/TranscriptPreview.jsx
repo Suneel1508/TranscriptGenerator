@@ -98,17 +98,12 @@ const TranscriptPreview = () => {
       <div style={{ 
         textAlign: 'center', 
         marginBottom: '20px', 
-        fontSize: '10px',
-        lineHeight: '1.4'
+        fontSize: '10px'
       }}>
-        <div style={{ marginBottom: '5px' }}>
-          {transcriptData.institutionAddress || '21050 McClellan Road, Cupertino CA 95014'}
-        </div>
-        <div>
-          Tel: {transcriptData.institutionPhone || '(408)865-0366'} &nbsp;&nbsp;
-          Email: {transcriptData.institutionEmail || 'transcript@legendcp.com'} &nbsp;&nbsp;
-          CEEB Code: {transcriptData.ceebCode || '054732'}
-        </div>
+        {transcriptData.institutionAddress || '21050 McClellan Road, Cupertino CA 95014'} &nbsp;&nbsp;
+        Tel: {transcriptData.institutionPhone || '(408)865-0366'} &nbsp;&nbsp;
+        Email: {transcriptData.institutionEmail || 'transcript@legendcp.com'} &nbsp;&nbsp;
+        CEEB Code: {transcriptData.ceebCode || '054732'}
       </div>
 
       {/* Student Information Block - NO GRID LINES */}
@@ -142,14 +137,14 @@ const TranscriptPreview = () => {
       </div>
 
       {/* MAIN LAYOUT: Left side (GPA + Enrollment) | Right side (Credit Completed + Credit Transfer) */}
-      <div style={{ display: 'flex', marginBottom: '20px', gap: '10px' }}>
+      <div style={{ display: 'flex', marginBottom: '20px', gap: '0px' }}>
         {/* LEFT SIDE */}
         <div style={{ width: '50%' }}>
           {/* GPA Summary Block */}
           <table style={{ 
             width: '100%', 
             borderCollapse: 'collapse', 
-            marginBottom: '10px',
+            marginBottom: '0px',
             border: '2px solid #000'
           }}>
             <tbody>
@@ -177,18 +172,18 @@ const TranscriptPreview = () => {
           </table>
 
           {/* Enrollment Summary Block - Split into TWO blocks */}
-          <div style={{ display: 'flex', gap: '1px' }}>
+          <div style={{ display: 'flex', gap: '0px' }}>
             {/* Block 1: Enrollment Details (Left) */}
             <div style={{ width: '70%' }}>
               <table style={{ 
                 width: '100%', 
                 borderCollapse: 'collapse',
-                border: '2px solid #000'
+                border: '2px solid #000',
+                borderTop: 'none'
               }}>
                 <tbody>
                   <tr>
                     <td style={{ 
-                      border: '1px solid #000', 
                       padding: '8px', 
                       backgroundColor: '#f0f0f0', 
                       fontWeight: 'bold',
@@ -249,20 +244,18 @@ const TranscriptPreview = () => {
               </table>
             </div>
 
-            {/* SEPARATOR LINE */}
-            <div style={{ width: '2px', backgroundColor: '#000' }}></div>
-
-            {/* Block 2: Total Credit Transfer (Right) */}
+            {/* Block 2: Total Credit Transfer (Right) - ONLY ONE SEPARATOR LINE */}
             <div style={{ width: '30%' }}>
               <table style={{ 
                 width: '100%', 
                 borderCollapse: 'collapse',
-                border: '2px solid #000'
+                border: '2px solid #000',
+                borderTop: 'none',
+                borderLeft: '1px solid #000'
               }}>
                 <tbody>
                   <tr>
                     <td style={{ 
-                      border: '1px solid #000', 
                       padding: '8px', 
                       backgroundColor: '#f0f0f0', 
                       fontWeight: 'bold',
@@ -274,7 +267,6 @@ const TranscriptPreview = () => {
                   {uniqueSchools.map((school, index) => (
                     <tr key={index}>
                       <td style={{ 
-                        border: '1px solid #000',
                         padding: '5px',
                         fontSize: '9px'
                       }}>
@@ -289,7 +281,6 @@ const TranscriptPreview = () => {
                   {Array.from({ length: Math.max(0, 7 - uniqueSchools.length) }, (_, i) => (
                     <tr key={`empty-${i}`}>
                       <td style={{ 
-                        border: '1px solid #000',
                         padding: '5px',
                         fontSize: '9px'
                       }}>
@@ -309,13 +300,13 @@ const TranscriptPreview = () => {
           <table style={{ 
             width: '100%', 
             borderCollapse: 'collapse', 
-            marginBottom: '10px',
-            border: '2px solid #000'
+            marginBottom: '0px',
+            border: '2px solid #000',
+            borderLeft: '1px solid #000'
           }}>
             <tbody>
               <tr>
                 <td style={{ 
-                  border: '1px solid #000', 
                   padding: '8px', 
                   backgroundColor: '#f0f0f0', 
                   fontWeight: 'bold',
@@ -326,7 +317,6 @@ const TranscriptPreview = () => {
               </tr>
               <tr>
                 <td style={{ 
-                  border: '1px solid #000', 
                   padding: '8px',
                   fontSize: '10px'
                 }}>
@@ -337,11 +327,16 @@ const TranscriptPreview = () => {
           </table>
 
           {/* Additional space to align with left side */}
-          <div style={{ height: '200px' }}></div>
+          <div style={{ 
+            height: '200px',
+            border: '2px solid #000',
+            borderTop: 'none',
+            borderLeft: '1px solid #000'
+          }}></div>
         </div>
       </div>
 
-      {/* Credit Summary Block - FULL WIDTH, NO INTERNAL GRID LINES, EDITABLE */}
+      {/* Credit Summary Block - FULL WIDTH, NO INTERNAL GRID LINES, PROPER ALIGNMENT */}
       <table style={{ 
         width: '100%', 
         borderCollapse: 'collapse', 
@@ -368,45 +363,37 @@ const TranscriptPreview = () => {
               fontSize: '9px',
               verticalAlign: 'top'
             }}>
-              {/* Left Block - Only show actual courses */}
-              {displayedCreditSummary.slice(0, Math.ceil(displayedCreditSummary.length / 2)).map((credit, index) => (
-                <div key={index} style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
-                  <strong>{credit.subject}</strong>
-                  <span>Earned: {credit.earned || 0}</span>
-                  <span>Required: {credit.required || 0}</span>
-                </div>
-              ))}
-              {/* Fill with default subjects if less than expected */}
-              {displayedCreditSummary.length < 8 && (
+              {/* Left Block - Show actual entered courses or defaults */}
+              {displayedCreditSummary.length > 0 ? (
+                displayedCreditSummary.slice(0, Math.ceil(displayedCreditSummary.length / 2)).map((credit, index) => (
+                  <div key={index} style={{ marginBottom: '5px', display: 'flex' }}>
+                    <span style={{ fontWeight: 'bold', width: '50%' }}>{credit.subject}</span>
+                    <span style={{ width: '25%' }}>Earned: {credit.earned || 0}</span>
+                    <span style={{ width: '25%' }}>Required: {credit.required || 0}</span>
+                  </div>
+                ))
+              ) : (
                 <>
-                  {!displayedCreditSummary.find(c => c.subject === 'History/Social Science') && (
-                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
-                      <strong>History/Social Science</strong>
-                      <span>Earned: 25</span>
-                      <span>Required: 30</span>
-                    </div>
-                  )}
-                  {!displayedCreditSummary.find(c => c.subject === 'English') && (
-                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
-                      <strong>English</strong>
-                      <span>Earned: 25</span>
-                      <span>Required: 40</span>
-                    </div>
-                  )}
-                  {!displayedCreditSummary.find(c => c.subject === 'Foreign Language') && (
-                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
-                      <strong>Foreign Language</strong>
-                      <span>Earned: 10</span>
-                      <span>Required: 20</span>
-                    </div>
-                  )}
-                  {!displayedCreditSummary.find(c => c.subject === 'Physical Education') && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <strong>Physical Education</strong>
-                      <span>Earned: 20</span>
-                      <span>Required: 10</span>
-                    </div>
-                  )}
+                  <div style={{ marginBottom: '5px', display: 'flex' }}>
+                    <span style={{ fontWeight: 'bold', width: '50%' }}>History/Social Science</span>
+                    <span style={{ width: '25%' }}>Earned: 25</span>
+                    <span style={{ width: '25%' }}>Required: 30</span>
+                  </div>
+                  <div style={{ marginBottom: '5px', display: 'flex' }}>
+                    <span style={{ fontWeight: 'bold', width: '50%' }}>English</span>
+                    <span style={{ width: '25%' }}>Earned: 25</span>
+                    <span style={{ width: '25%' }}>Required: 40</span>
+                  </div>
+                  <div style={{ marginBottom: '5px', display: 'flex' }}>
+                    <span style={{ fontWeight: 'bold', width: '50%' }}>Foreign Language</span>
+                    <span style={{ width: '25%' }}>Earned: 10</span>
+                    <span style={{ width: '25%' }}>Required: 20</span>
+                  </div>
+                  <div style={{ display: 'flex' }}>
+                    <span style={{ fontWeight: 'bold', width: '50%' }}>Physical Education</span>
+                    <span style={{ width: '25%' }}>Earned: 20</span>
+                    <span style={{ width: '25%' }}>Required: 10</span>
+                  </div>
                 </>
               )}
             </td>
@@ -416,45 +403,37 @@ const TranscriptPreview = () => {
               fontSize: '9px',
               verticalAlign: 'top'
             }}>
-              {/* Right Block - Only show actual courses */}
-              {displayedCreditSummary.slice(Math.ceil(displayedCreditSummary.length / 2)).map((credit, index) => (
-                <div key={index} style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
-                  <strong>{credit.subject}</strong>
-                  <span>Earned: {credit.earned || 0}</span>
-                  <span>Required: {credit.required || 0}</span>
-                </div>
-              ))}
-              {/* Fill with default subjects if less than expected */}
-              {displayedCreditSummary.length < 8 && (
+              {/* Right Block - Show actual entered courses or defaults */}
+              {displayedCreditSummary.length > 0 ? (
+                displayedCreditSummary.slice(Math.ceil(displayedCreditSummary.length / 2)).map((credit, index) => (
+                  <div key={index} style={{ marginBottom: '5px', display: 'flex' }}>
+                    <span style={{ fontWeight: 'bold', width: '50%' }}>{credit.subject}</span>
+                    <span style={{ width: '25%' }}>Earned: {credit.earned || 0}</span>
+                    <span style={{ width: '25%' }}>Required: {credit.required || 0}</span>
+                  </div>
+                ))
+              ) : (
                 <>
-                  {!displayedCreditSummary.find(c => c.subject === 'Mathematics') && (
-                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
-                      <strong>Mathematics</strong>
-                      <span>Earned: 45</span>
-                      <span>Required: 40</span>
-                    </div>
-                  )}
-                  {!displayedCreditSummary.find(c => c.subject === 'Laboratory Science') && (
-                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
-                      <strong>Laboratory Science</strong>
-                      <span>Earned: 35</span>
-                      <span>Required: 30</span>
-                    </div>
-                  )}
-                  {!displayedCreditSummary.find(c => c.subject === 'Arts') && (
-                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
-                      <strong>Arts</strong>
-                      <span>Earned: 10</span>
-                      <span>Required: 20</span>
-                    </div>
-                  )}
-                  {!displayedCreditSummary.find(c => c.subject === 'Elective') && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <strong>Elective</strong>
-                      <span>Earned: 60</span>
-                      <span>Required: 70</span>
-                    </div>
-                  )}
+                  <div style={{ marginBottom: '5px', display: 'flex' }}>
+                    <span style={{ fontWeight: 'bold', width: '50%' }}>Mathematics</span>
+                    <span style={{ width: '25%' }}>Earned: 45</span>
+                    <span style={{ width: '25%' }}>Required: 40</span>
+                  </div>
+                  <div style={{ marginBottom: '5px', display: 'flex' }}>
+                    <span style={{ fontWeight: 'bold', width: '50%' }}>Laboratory Science</span>
+                    <span style={{ width: '25%' }}>Earned: 35</span>
+                    <span style={{ width: '25%' }}>Required: 30</span>
+                  </div>
+                  <div style={{ marginBottom: '5px', display: 'flex' }}>
+                    <span style={{ fontWeight: 'bold', width: '50%' }}>Arts</span>
+                    <span style={{ width: '25%' }}>Earned: 10</span>
+                    <span style={{ width: '25%' }}>Required: 20</span>
+                  </div>
+                  <div style={{ display: 'flex' }}>
+                    <span style={{ fontWeight: 'bold', width: '50%' }}>Elective</span>
+                    <span style={{ width: '25%' }}>Earned: 60</span>
+                    <span style={{ width: '25%' }}>Required: 70</span>
+                  </div>
                 </>
               )}
             </td>
@@ -489,7 +468,7 @@ const TranscriptPreview = () => {
                         fontSize: '11px',
                         textAlign: 'center'
                       }} colSpan="12">
-                        #{school}
+                        {school}
                       </td>
                     </tr>
 
