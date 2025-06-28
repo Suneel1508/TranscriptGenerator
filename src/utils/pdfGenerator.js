@@ -235,7 +235,10 @@ export const generatePDFViaPrint = async (transcriptData) => {
             font-size: 11px;
             line-height: 1.2;
             color: black;
-            background: white;
+            color: #000 !important;
+            background: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
             margin: 0;
             padding: 0;
           }
@@ -247,6 +250,9 @@ export const generatePDFViaPrint = async (transcriptData) => {
             border: 1px solid black;
             padding: 4px;
             text-align: left;
+          }
+ th {
+            background-color: #f5f5f5 !important;
           }
           .no-print {
             display: none;
