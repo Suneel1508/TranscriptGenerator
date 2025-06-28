@@ -248,7 +248,7 @@ export const generatePDFViaPrint = async (transcriptData) => {
           }
           
           th, td {
-            border: 1px solid #000 !important;
+            border: none !important;
             padding: 3px !important;
             text-align: left !important;
             font-size: 9px !important;
