@@ -206,69 +206,43 @@ const TranscriptPreview = () => {
           <tr>
             <td style={{ 
               border: '1px solid #000',
-              padding: '0px',
+              padding: '8px',
               fontSize: '9px',
               verticalAlign: 'top'
             }}>
-              {/* Enrollment Summary Content - NO INTERNAL BORDERS */}
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <tbody>
-                  <tr style={{ backgroundColor: '#f8f8f8' }}>
-                    <td style={{ 
-                      padding: '5px', 
-                      fontWeight: 'bold',
-                      fontSize: '9px',
-                      width: '35%',
-                      border: 'none'
-                    }}>
-                      Start/End Date
-                    </td>
-                    <td style={{ 
-                      padding: '5px', 
-                      fontWeight: 'bold',
-                      fontSize: '9px',
-                      width: '20%',
-                      border: 'none'
-                    }}>
-                      Grade
-                    </td>
-                    <td style={{ 
-                      padding: '5px', 
-                      fontWeight: 'bold',
-                      fontSize: '9px',
-                      width: '45%',
-                      border: 'none'
-                    }}>
-                      School
-                    </td>
-                  </tr>
-                  {transcriptData.enrollmentSummary.slice(0, 7).map((enrollment, index) => (
-                    <tr key={index}>
-                      <td style={{ 
-                        padding: '5px',
-                        fontSize: '9px',
-                        border: 'none'
-                      }}>
-                        {enrollment.startEndDate || (index === 0 ? '2016-2017' : index === 1 ? '2016-2017' : index === 2 ? '2017-2018' : index === 3 ? '2017-2018' : index === 4 ? '2017-2018' : index === 5 ? '2016-2017' : '2016-2017')}
-                      </td>
-                      <td style={{ 
-                        padding: '5px',
-                        fontSize: '9px',
-                        border: 'none'
-                      }}>
-                        {enrollment.grade || (index === 0 ? '9' : index === 1 ? '9' : index === 2 ? '10' : index === 3 ? '10' : index === 4 ? '10' : index === 5 ? '11' : '11')}
-                      </td>
-                      <td style={{ 
-                        padding: '5px',
-                        fontSize: '9px',
-                        border: 'none'
-                      }}>
-                        {enrollment.school || (index === 0 ? 'Leigh High School' : index === 1 ? 'Foothill College' : index === 2 ? 'Leigh High School' : index === 3 ? 'Foothill College' : index === 4 ? 'De Anza College' : index === 5 ? 'Legend College Preparatory' : 'Leigh High School')}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              {/* ✅ ENROLLMENT SUMMARY CONTENT - ABSOLUTELY NO INTERNAL BORDERS */}
+              <div style={{ width: '100%' }}>
+                {/* Column Headers - NO BORDERS */}
+                <div style={{ 
+                  display: 'flex', 
+                  fontWeight: 'bold',
+                  marginBottom: '8px',
+                  paddingBottom: '4px',
+                  borderBottom: '1px solid #ccc'
+                }}>
+                  <div style={{ width: '35%', padding: '2px' }}>Start/End Date</div>
+                  <div style={{ width: '20%', padding: '2px' }}>Grade</div>
+                  <div style={{ width: '45%', padding: '2px' }}>School</div>
+                </div>
+                
+                {/* Data Rows - NO BORDERS */}
+                {transcriptData.enrollmentSummary.slice(0, 7).map((enrollment, index) => (
+                  <div key={index} style={{ 
+                    display: 'flex',
+                    marginBottom: '4px'
+                  }}>
+                    <div style={{ width: '35%', padding: '2px' }}>
+                      {enrollment.startEndDate || (index === 0 ? '2016-2017' : index === 1 ? '2016-2017' : index === 2 ? '2017-2018' : index === 3 ? '2017-2018' : index === 4 ? '2017-2018' : index === 5 ? '2016-2017' : '2016-2017')}
+                    </div>
+                    <div style={{ width: '20%', padding: '2px' }}>
+                      {enrollment.grade || (index === 0 ? '9' : index === 1 ? '9' : index === 2 ? '10' : index === 3 ? '10' : index === 4 ? '10' : index === 5 ? '11' : '11')}
+                    </div>
+                    <div style={{ width: '45%', padding: '2px' }}>
+                      {enrollment.school || (index === 0 ? 'Leigh High School' : index === 1 ? 'Foothill College' : index === 2 ? 'Leigh High School' : index === 3 ? 'Foothill College' : index === 4 ? 'De Anza College' : index === 5 ? 'Legend College Preparatory' : 'Leigh High School')}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </td>
             <td style={{ 
               border: '1px solid #000',
@@ -276,21 +250,23 @@ const TranscriptPreview = () => {
               fontSize: '9px',
               verticalAlign: 'top'
             }}>
-              {/* Credit Transfer Content - NO INTERNAL BORDERS */}
-              {displayedCreditTransfer.length > 0 ? (
-                displayedCreditTransfer.map((transfer, index) => (
-                  <div key={index} style={{ marginBottom: '5px' }}>
-                    {transfer.credits} {transfer.school}
-                  </div>
-                ))
-              ) : (
-                // Default entries if none are added
-                <>
-                  <div style={{ marginBottom: '5px' }}>150 Leigh High School</div>
-                  <div style={{ marginBottom: '5px' }}>30 Foothill College</div>
-                  <div style={{ marginBottom: '5px' }}>10 De Anza College</div>
-                </>
-              )}
+              {/* ✅ CREDIT TRANSFER CONTENT - NO INTERNAL BORDERS */}
+              <div style={{ width: '100%' }}>
+                {displayedCreditTransfer.length > 0 ? (
+                  displayedCreditTransfer.map((transfer, index) => (
+                    <div key={index} style={{ marginBottom: '5px' }}>
+                      {transfer.credits} {transfer.school}
+                    </div>
+                  ))
+                ) : (
+                  // Default entries if none are added
+                  <>
+                    <div style={{ marginBottom: '5px' }}>150 Leigh High School</div>
+                    <div style={{ marginBottom: '5px' }}>30 Foothill College</div>
+                    <div style={{ marginBottom: '5px' }}>10 De Anza College</div>
+                  </>
+                )}
+              </div>
             </td>
           </tr>
 
@@ -315,13 +291,17 @@ const TranscriptPreview = () => {
               fontSize: '9px',
               verticalAlign: 'top'
             }} colSpan="2">
-              {/* Credit Summary Content - TWO COLUMN LAYOUT, NO INTERNAL BORDERS */}
+              {/* ✅ CREDIT SUMMARY CONTENT - NO INTERNAL BORDERS EXCEPT CENTER DIVIDER */}
               <div style={{ display: 'flex' }}>
+                {/* LEFT BLOCK - NO INTERNAL BORDERS */}
                 <div style={{ width: '50%', paddingRight: '10px' }}>
-                  {/* Left Block - Show actual entered courses or defaults */}
                   {displayedCreditSummary.length > 0 ? (
                     displayedCreditSummary.slice(0, Math.ceil(displayedCreditSummary.length / 2)).map((credit, index) => (
-                      <div key={index} style={{ marginBottom: '5px', display: 'flex' }}>
+                      <div key={index} style={{ 
+                        marginBottom: '5px', 
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}>
                         <span style={{ fontWeight: 'bold', width: '50%' }}>{credit.subject}</span>
                         <span style={{ width: '25%' }}>Earned: {credit.earned || 0}</span>
                         <span style={{ width: '25%' }}>Required: {credit.required || 0}</span>
@@ -329,22 +309,22 @@ const TranscriptPreview = () => {
                     ))
                   ) : (
                     <>
-                      <div style={{ marginBottom: '5px', display: 'flex' }}>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
                         <span style={{ fontWeight: 'bold', width: '50%' }}>History/Social Science</span>
                         <span style={{ width: '25%' }}>Earned: 25</span>
                         <span style={{ width: '25%' }}>Required: 30</span>
                       </div>
-                      <div style={{ marginBottom: '5px', display: 'flex' }}>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
                         <span style={{ fontWeight: 'bold', width: '50%' }}>English</span>
                         <span style={{ width: '25%' }}>Earned: 25</span>
                         <span style={{ width: '25%' }}>Required: 40</span>
                       </div>
-                      <div style={{ marginBottom: '5px', display: 'flex' }}>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
                         <span style={{ fontWeight: 'bold', width: '50%' }}>Foreign Language</span>
                         <span style={{ width: '25%' }}>Earned: 10</span>
                         <span style={{ width: '25%' }}>Required: 20</span>
                       </div>
-                      <div style={{ display: 'flex' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span style={{ fontWeight: 'bold', width: '50%' }}>Physical Education</span>
                         <span style={{ width: '25%' }}>Earned: 20</span>
                         <span style={{ width: '25%' }}>Required: 10</span>
@@ -352,11 +332,20 @@ const TranscriptPreview = () => {
                     </>
                   )}
                 </div>
-                <div style={{ width: '50%', paddingLeft: '10px', borderLeft: '1px solid #000' }}>
-                  {/* Right Block - Show actual entered courses or defaults */}
+                
+                {/* RIGHT BLOCK - NO INTERNAL BORDERS, ONLY LEFT SEPARATOR */}
+                <div style={{ 
+                  width: '50%', 
+                  paddingLeft: '10px', 
+                  borderLeft: '1px solid #000'
+                }}>
                   {displayedCreditSummary.length > 0 ? (
                     displayedCreditSummary.slice(Math.ceil(displayedCreditSummary.length / 2)).map((credit, index) => (
-                      <div key={index} style={{ marginBottom: '5px', display: 'flex' }}>
+                      <div key={index} style={{ 
+                        marginBottom: '5px', 
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}>
                         <span style={{ fontWeight: 'bold', width: '50%' }}>{credit.subject}</span>
                         <span style={{ width: '25%' }}>Earned: {credit.earned || 0}</span>
                         <span style={{ width: '25%' }}>Required: {credit.required || 0}</span>
@@ -364,22 +353,22 @@ const TranscriptPreview = () => {
                     ))
                   ) : (
                     <>
-                      <div style={{ marginBottom: '5px', display: 'flex' }}>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
                         <span style={{ fontWeight: 'bold', width: '50%' }}>Mathematics</span>
                         <span style={{ width: '25%' }}>Earned: 45</span>
                         <span style={{ width: '25%' }}>Required: 40</span>
                       </div>
-                      <div style={{ marginBottom: '5px', display: 'flex' }}>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
                         <span style={{ fontWeight: 'bold', width: '50%' }}>Laboratory Science</span>
                         <span style={{ width: '25%' }}>Earned: 35</span>
                         <span style={{ width: '25%' }}>Required: 30</span>
                       </div>
-                      <div style={{ marginBottom: '5px', display: 'flex' }}>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
                         <span style={{ fontWeight: 'bold', width: '50%' }}>Arts</span>
                         <span style={{ width: '25%' }}>Earned: 10</span>
                         <span style={{ width: '25%' }}>Required: 20</span>
                       </div>
-                      <div style={{ display: 'flex' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span style={{ fontWeight: 'bold', width: '50%' }}>Elective</span>
                         <span style={{ width: '25%' }}>Earned: 60</span>
                         <span style={{ width: '25%' }}>Required: 70</span>
