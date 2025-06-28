@@ -144,7 +144,7 @@ const TranscriptForm = () => {
           className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
         >
           <Printer className="h-4 w-4" />
-          <span>Print to PDF (Alternative)</span>
+          <span>Print to PDF</span>
         </button>
         
         {/* PDF Quality Test */}

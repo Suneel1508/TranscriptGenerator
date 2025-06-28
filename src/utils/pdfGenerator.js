@@ -225,11 +225,7 @@ export const generatePDFViaPrint = async (transcriptData) => {
             margin: 0.5in;
           }
           
-          * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-          }
+
           
           body {
             font-family: Arial, sans-serif !important;
