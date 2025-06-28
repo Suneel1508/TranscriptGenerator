@@ -219,71 +219,7 @@ export const generatePDFViaPrint = async (transcriptData) => {
       <html>
       <head>
         <title>Official Transcript - ${transcriptData.studentName || 'Student'}</title>
-        <style>
-          @page {
-            size: A4;
-            margin: 0.5in;
-          }
-          
-
-          
-          body {
-            font-family: Arial, sans-serif !important;
-            font-size: 11px !important;
-            line-height: 1.2 !important;
-            color: #000 !important;
-            background: white !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          
-          table {
-            border-collapse: collapse !important;
-            width: 100% !important;
-            border: 1px solid #000 !important;
-          }
-          
-          th, td {
-            border: none !important;
-            padding: 3px !important;
-            text-align: left !important;
-            font-size: 9px !important;
-            vertical-align: top !important;
-          }
-          
-          th {
-            background-color: #f5f5f5 !important;
-            font-weight: bold !important;
-          }
-          
-          .transcript-preview {
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-          }
-          
-          /* Ensure no elements break across pages */
-          .page-break-inside-avoid {
-            page-break-inside: avoid !important;
-          }
-          
-          /* Hide any interactive elements */
-          button, .btn, .hover\\:*, [class*="hover"] {
-            display: none !important;
-          }
-          
-          /* Ensure all borders are visible */
-          [style*="border"] {
-            border: 1px solid #000 !important;
-          }
-          
-          /* Fix any potential text rendering issues */
-          * {
-            text-rendering: optimizeLegibility !important;
-            -webkit-font-smoothing: antialiased !important;
-          }
-        </style>
+        
       </head>
       <body>
         ${element.outerHTML}
