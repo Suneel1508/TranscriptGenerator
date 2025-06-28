@@ -1,5 +1,6 @@
 import React from 'react'
 import { useTranscript } from '../context/TranscriptContext'
+import { Plus, Trash2 } from 'lucide-react'
 
 const StudentInfoForm = () => {
   const { transcriptData, updateTranscriptData, formatSSNInput } = useTranscript()
@@ -17,6 +18,18 @@ const StudentInfoForm = () => {
     const newEnrollment = [...transcriptData.enrollmentSummary]
     newEnrollment[index] = { ...newEnrollment[index], [field]: value }
     updateTranscriptData({ enrollmentSummary: newEnrollment })
+  }
+
+  const addEnrollmentEntry = () => {
+    const newEnrollment = [...transcriptData.enrollmentSummary, { startEndDate: '', grade: '', school: '' }]
+    updateTranscriptData({ enrollmentSummary: newEnrollment })
+  }
+
+  const removeEnrollmentEntry = (index) => {
+    if (transcriptData.enrollmentSummary.length > 1) {
+      const newEnrollment = transcriptData.enrollmentSummary.filter((_, i) => i !== index)
+      updateTranscriptData({ enrollmentSummary: newEnrollment })
+    }
   }
 
   const handleCreditSummaryChange = (index, field, value) => {
@@ -245,49 +258,80 @@ const StudentInfoForm = () => {
         </div>
       </div>
 
-      {/* Enrollment Summary */}
+      {/* DYNAMIC Enrollment Summary */}
       <div className="bg-gray-50 p-4 rounded-lg">
-        <h4 className="text-md font-medium text-gray-900 mb-4">Enrollment Summary</h4>
-        {transcriptData.enrollmentSummary.map((enrollment, index) => (
-          <div key={index} className="grid md:grid-cols-3 gap-4 mb-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Start/End Date
-              </label>
-              <input
-                type="text"
-                value={enrollment.startEndDate}
-                onChange={(e) => handleEnrollmentChange(index, 'startEndDate', e.target.value)}
-                className="input-field"
-                placeholder="e.g., 2020-2021"
-              />
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-md font-medium text-gray-900">Enrollment Summary</h4>
+          <button
+            type="button"
+            onClick={addEnrollmentEntry}
+            className="btn-primary flex items-center space-x-2 text-sm"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add School</span>
+          </button>
+        </div>
+        
+        <div className="space-y-4">
+          {transcriptData.enrollmentSummary.map((enrollment, index) => (
+            <div key={index} className="grid md:grid-cols-4 gap-4 p-3 bg-white rounded border">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start/End Date
+                </label>
+                <input
+                  type="text"
+                  value={enrollment.startEndDate}
+                  onChange={(e) => handleEnrollmentChange(index, 'startEndDate', e.target.value)}
+                  className="input-field"
+                  placeholder="e.g., 2020-2021"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Grade
+                </label>
+                <input
+                  type="text"
+                  value={enrollment.grade}
+                  onChange={(e) => handleEnrollmentChange(index, 'grade', e.target.value)}
+                  className="input-field"
+                  placeholder="e.g., 9"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  School
+                </label>
+                <input
+                  type="text"
+                  value={enrollment.school}
+                  onChange={(e) => handleEnrollmentChange(index, 'school', e.target.value)}
+                  className="input-field"
+                  placeholder="e.g., Previous School Name"
+                />
+              </div>
+              <div className="flex items-end">
+                {transcriptData.enrollmentSummary.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeEnrollmentEntry(index)}
+                    className="btn-secondary text-red-600 hover:text-red-800 hover:bg-red-50 flex items-center space-x-1"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span>Remove</span>
+                  </button>
+                )}
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Grade
-              </label>
-              <input
-                type="text"
-                value={enrollment.grade}
-                onChange={(e) => handleEnrollmentChange(index, 'grade', e.target.value)}
-                className="input-field"
-                placeholder="e.g., 9"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                School
-              </label>
-              <input
-                type="text"
-                value={enrollment.school}
-                onChange={(e) => handleEnrollmentChange(index, 'school', e.target.value)}
-                className="input-field"
-                placeholder="e.g., Previous School Name"
-              />
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
+          <p className="text-sm text-blue-800">
+            <strong>Tip:</strong> Add all schools the student attended. Each entry will appear in the enrollment summary section of the transcript.
+          </p>
+        </div>
       </div>
 
       {/* Credit Summary - IMPROVED 2-BLOCK LAYOUT */}
