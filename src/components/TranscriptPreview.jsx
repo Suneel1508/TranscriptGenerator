@@ -485,7 +485,7 @@ const TranscriptPreview = () => {
       }}>
         {/* LEFT SIDE: Comments Box with Border and Header */}
         <div style={{ 
-          width: '60%',
+          width: '40%',
           border: '2px solid #000'
         }}>
           {/* Comments Header */}
@@ -587,7 +587,7 @@ const TranscriptPreview = () => {
           <div style={{ 
             borderTop: '1px solid #000', 
             paddingTop: '8px',
-            minWidth: '250px'
+            minWidth: '150px'
           }}>
             <div style={{ marginBottom: '5px' }}>
               Principal Signature: {transcriptData.principalName || 'Principal Name'}
