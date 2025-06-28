@@ -67,9 +67,9 @@ export const SCHOOL_OPTIONS = [
  * @returns {boolean} Whether grade counts for GPA
  */
 export const isGradeCountedForGPA = (grade) => {
-  // IP (In Progress) grades should NOT be counted
-  // P (Pass) grades should be counted for credits but may need special handling
-  const excludedGrades = ['IP', 'S', 'H'] // In Progress, Satisfactory, Honors (non-letter)
+  // IP (In Progress) and P (Pass) grades should NOT be counted in GPA
+  // S (Satisfactory) and H (Honors non-letter) also excluded
+  const excludedGrades = ['IP', 'P', 'S', 'H']
   return grade && !excludedGrades.includes(grade)
 }
 
@@ -79,9 +79,9 @@ export const isGradeCountedForGPA = (grade) => {
  * @returns {boolean} Whether grade counts for credits
  */
 export const isGradeCountedForCredits = (grade) => {
-  // IP (In Progress) grades should NOT count for credits
-  // P (Pass) grades should count for credits
-  const excludedGrades = ['IP'] // Only In Progress is excluded from credits
+  // Only IP (In Progress) is excluded from credits
+  // P (Pass) grades count for credits but not GPA
+  const excludedGrades = ['IP']
   return grade && !excludedGrades.includes(grade)
 }
 
@@ -96,7 +96,7 @@ export const getGradePoints = (grade, courseLevel = '', weighted = true) => {
   if (!grade || !isGradeCountedForGPA(grade)) return 0
   
   // Handle special grades
-  if (grade === 'P') return weighted ? 4.00 : 4.00 // Pass = 4.0 points
+  if (grade === 'P') return 0 // P grades are excluded from GPA calculation
   if (grade === 'F') return 0.00 // Fail = 0.0 points
   
   if (!weighted) {
@@ -143,6 +143,7 @@ export const calculateGPA = (courses, weighted = true) => {
   let totalPoints = 0
   let totalCredits = 0
   let validCourses = 0
+  let gpaCredits = 0 // Credits that count toward GPA calculation
 
   courses.forEach(course => {
     const credits = parseFloat(course.credits) || 0
@@ -154,26 +155,29 @@ export const calculateGPA = (courses, weighted = true) => {
       return
     }
 
-    // Only count credits for courses that should be counted
+    // Count credits for courses that should be counted (excludes IP)
     if (isGradeCountedForCredits(grade)) {
       totalCredits += credits
       validCourses++
     }
 
-    // Only count points for courses that should be counted for GPA
+    // Only count points and credits for GPA calculation (excludes IP and P)
     if (isGradeCountedForGPA(grade)) {
       const points = calculateCoursePoints(grade, credits, courseLevel, weighted)
       totalPoints += points
+      gpaCredits += credits // Only these credits count for GPA calculation
     }
   })
 
-  const gpa = totalCredits > 0 ? totalPoints / totalCredits : 0
+  // GPA calculation uses only credits from courses that count for GPA
+  const gpa = gpaCredits > 0 ? totalPoints / gpaCredits : 0
 
   return {
     gpa: Math.round(gpa * 1000) / 1000, // Round to 3 decimal places
-    totalCredits,
+    totalCredits, // All credits (including P grades, excluding IP)
     totalPoints: Math.round(totalPoints * 1000) / 1000,
-    courseCount: validCourses
+    courseCount: validCourses,
+    gpaCredits // Credits used in GPA calculation (excluding P and IP)
   }
 }
 
