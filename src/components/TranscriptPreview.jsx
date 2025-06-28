@@ -526,7 +526,7 @@ const TranscriptPreview = () => {
                     <img
                       src={transcriptData.signature.preview}
                       alt="Principal Signature"
-                      style={{ height: '100px', maxWidth: '190px', margin: '0 auto', objectFit: 'contain' }}
+                      style={{ height: '110px', maxWidth: '210px', margin: '0 auto', objectFit: 'contain' }}
                     />
                   </div>
                 )}
