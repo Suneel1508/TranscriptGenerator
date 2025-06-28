@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useTranscript } from '../context/TranscriptContext'
-import { Plus, Trash2, Edit2, Calculator, Copy } from 'lucide-react'
+import { Plus, Trash2, Edit2, Calculator } from 'lucide-react'
 import { 
   calculateGPA, 
   calculateSemesterGPA, 
@@ -9,7 +9,6 @@ import {
   getGradePoints,
   validateCourse,
   COURSE_LEVELS,
-  SCHOOL_OPTIONS,
   getCourseLevelName,
   isGradeCountedForGPA,
   isGradeCountedForCredits
@@ -24,10 +23,10 @@ const CoursesForm = () => {
     schoolYear: '',
     courseTitle: '',
     hap: '',
-    grade1st: '', // First semester grade
-    grade2nd: '', // Second semester grade
+    grade: '',
     credits: '',
-    school: ''
+    school: '',
+    semester: '1st'
   })
   const [gpaData, setGpaData] = useState({
     weighted: { gpa: 0, totalCredits: 0 },
@@ -57,10 +56,10 @@ const CoursesForm = () => {
       schoolYear: '',
       courseTitle: '',
       hap: '',
-      grade1st: '',
-      grade2nd: '',
+      grade: '',
       credits: '',
-      school: ''
+      school: '',
+      semester: '1st'
     })
     setIsAdding(false)
     setEditingCourse(null)
@@ -69,89 +68,32 @@ const CoursesForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    // Create courses for both semesters if grades are provided
-    const coursesToAdd = []
+    // Check if it's an IP grade
+    const isIPGrade = courseForm.grade === 'IP'
     
-    // First semester course
-    if (courseForm.grade1st) {
-      const isIPGrade1st = courseForm.grade1st === 'IP'
-      const course1st = {
-        ...courseForm,
-        grade: courseForm.grade1st,
-        semester: '1st',
-        credits: isIPGrade1st ? '' : courseForm.credits
-      }
-      
-      // Validate first semester course
-      const courseToValidate1st = isIPGrade1st ? { ...course1st, credits: '0' } : course1st
-      const validation1st = validateCourse(courseToValidate1st)
-      if (!validation1st.isValid) {
-        alert('Please fix the following errors for 1st semester:\n' + validation1st.errors.join('\n'))
-        return
-      }
-      
-      coursesToAdd.push(course1st)
-    }
+    // For IP grades, create a version with empty credits for validation
+    const courseToValidate = isIPGrade ? { ...courseForm, credits: '0' } : courseForm
     
-    // Second semester course
-    if (courseForm.grade2nd) {
-      const isIPGrade2nd = courseForm.grade2nd === 'IP'
-      const course2nd = {
-        ...courseForm,
-        grade: courseForm.grade2nd,
-        semester: '2nd',
-        credits: isIPGrade2nd ? '' : courseForm.credits
-      }
-      
-      // Validate second semester course
-      const courseToValidate2nd = isIPGrade2nd ? { ...course2nd, credits: '0' } : course2nd
-      const validation2nd = validateCourse(courseToValidate2nd)
-      if (!validation2nd.isValid) {
-        alert('Please fix the following errors for 2nd semester:\n' + validation2nd.errors.join('\n'))
-        return
-      }
-      
-      coursesToAdd.push(course2nd)
-    }
-
-    if (coursesToAdd.length === 0) {
-      alert('Please enter at least one semester grade.')
+    // Validate course data
+    const validation = validateCourse(courseToValidate)
+    if (!validation.isValid) {
+      alert('Please fix the following errors:\n' + validation.errors.join('\n'))
       return
     }
 
+    // For IP grades, ensure credits is empty string in the final course
+    const finalCourse = isIPGrade ? { ...courseForm, credits: '' } : courseForm
+
     if (editingCourse) {
-      // For editing, we need to handle this differently
-      // For now, just update the first course found
-      updateCourse(editingCourse.id, coursesToAdd[0])
+      updateCourse(editingCourse.id, finalCourse)
     } else {
-      // Add all courses
-      coursesToAdd.forEach(course => {
-        addCourse(course)
-      })
+      addCourse(finalCourse)
     }
-    
     resetForm()
   }
 
   const handleEdit = (course) => {
-    // Find related course for the other semester
-    const relatedCourse = transcriptData.courses.find(c => 
-      c.courseTitle === course.courseTitle &&
-      c.gradeLevel === course.gradeLevel &&
-      c.schoolYear === course.schoolYear &&
-      c.semester !== course.semester
-    )
-    
-    setCourseForm({
-      gradeLevel: course.gradeLevel,
-      schoolYear: course.schoolYear,
-      courseTitle: course.courseTitle,
-      hap: course.hap,
-      grade1st: course.semester === '1st' ? course.grade : (relatedCourse?.grade || ''),
-      grade2nd: course.semester === '2nd' ? course.grade : (relatedCourse?.grade || ''),
-      credits: course.credits,
-      school: course.school
-    })
+    setCourseForm(course)
     setEditingCourse(course)
     setIsAdding(true)
   }
@@ -159,16 +101,16 @@ const CoursesForm = () => {
   const gradeOptions = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'P', 'IP', 'S', 'H']
 
   // Calculate weighted points for current form
-  const getCurrentCoursePoints = (grade) => {
-    if (grade && courseForm.credits && courseForm.hap !== undefined) {
-      return calculateCoursePoints(grade, courseForm.credits, courseForm.hap, true)
+  const getCurrentCoursePoints = () => {
+    if (courseForm.grade && courseForm.credits && courseForm.hap !== undefined) {
+      return calculateCoursePoints(courseForm.grade, courseForm.credits, courseForm.hap, true)
     }
     return 0
   }
 
-  const getCurrentGradePoints = (grade) => {
-    if (grade && courseForm.hap !== undefined) {
-      return getGradePoints(grade, courseForm.hap, true)
+  const getCurrentGradePoints = () => {
+    if (courseForm.grade && courseForm.hap !== undefined) {
+      return getGradePoints(courseForm.grade, courseForm.hap, true)
     }
     return 0
   }
@@ -195,10 +137,8 @@ const CoursesForm = () => {
   const semesterGPAs = calculateSemesterGPA(transcriptData.courses, true)
   const yearlyGPAs = calculateYearlyGPA(transcriptData.courses, true)
 
-  // Check if current grades are IP to make credits optional
-  const isIPGrade1st = courseForm.grade1st === 'IP'
-  const isIPGrade2nd = courseForm.grade2nd === 'IP'
-  const anyIPGrade = isIPGrade1st || isIPGrade2nd
+  // Check if current grade is IP to make credits optional
+  const isIPGrade = courseForm.grade === 'IP'
 
   return (
     <div className="space-y-6">
@@ -222,10 +162,7 @@ const CoursesForm = () => {
           </div>
           <div className="text-2xl font-bold text-blue-900">{gpaData.weighted.gpa.toFixed(3)}</div>
           <div className="text-sm text-blue-700">
-            {gpaData.weighted.gpaCredits || gpaData.weighted.totalCredits} GPA credits • {gpaData.weighted.courseCount} courses
-          </div>
-          <div className="text-xs text-blue-600">
-            Total credits earned: {gpaData.weighted.totalCredits}
+            {gpaData.weighted.totalCredits} total credits • {gpaData.weighted.courseCount} courses
           </div>
         </div>
         
@@ -241,7 +178,7 @@ const CoursesForm = () => {
         </div>
       </div>
 
-      {/* Add/Edit Course Form - DUAL SEMESTER ENTRY */}
+      {/* Add/Edit Course Form */}
       {isAdding && (
         <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
           <h4 className="text-md font-medium text-gray-900 mb-4">
@@ -280,16 +217,16 @@ const CoursesForm = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Course Level
+                  Semester *
                 </label>
                 <select
-                  value={courseForm.hap}
-                  onChange={(e) => setCourseForm(prev => ({ ...prev, hap: e.target.value }))}
+                  value={courseForm.semester}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, semester: e.target.value }))}
                   className="input-field"
+                  required
                 >
-                  {COURSE_LEVELS.map(level => (
-                    <option key={level.value} value={level.value}>{level.label}</option>
-                  ))}
+                  <option value="1st">1st Semester</option>
+                  <option value="2nd">2nd Semester</option>
                 </select>
               </div>
               <div className="md:col-span-2">
@@ -307,7 +244,37 @@ const CoursesForm = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Credits {!anyIPGrade && '*'}
+                  Course Level
+                </label>
+                <select
+                  value={courseForm.hap}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, hap: e.target.value }))}
+                  className="input-field"
+                >
+                  {COURSE_LEVELS.map(level => (
+                    <option key={level.value} value={level.value}>{level.label}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Grade *
+                </label>
+                <select
+                  value={courseForm.grade}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, grade: e.target.value }))}
+                  className="input-field"
+                  required
+                >
+                  <option value="">Select Grade</option>
+                  {gradeOptions.map(grade => (
+                    <option key={grade} value={grade}>{grade}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Credits {!isIPGrade && '*'}
                 </label>
                 <input
                   type="number"
@@ -316,102 +283,45 @@ const CoursesForm = () => {
                   value={courseForm.credits}
                   onChange={(e) => setCourseForm(prev => ({ ...prev, credits: e.target.value }))}
                   className="input-field"
-                  placeholder={anyIPGrade ? 'Optional for IP grades' : 'e.g., 5'}
-                  required={!anyIPGrade}
+                  placeholder={isIPGrade ? 'Optional for IP grades' : 'e.g., 5'}
+                  required={!isIPGrade}
                 />
-                {anyIPGrade && (
+                {isIPGrade && (
                   <p className="text-xs text-orange-600 mt-1">
                     Credits are optional for In Progress (IP) courses
                   </p>
                 )}
               </div>
-            </div>
-
-            {/* DUAL SEMESTER GRADE ENTRY */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h5 className="font-medium text-blue-900 mb-3 flex items-center">
-                <Copy className="h-4 w-4 mr-2" />
-                Semester Grades (Enter grades for one or both semesters)
-              </h5>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    1st Semester Grade
-                  </label>
-                  <select
-                    value={courseForm.grade1st}
-                    onChange={(e) => setCourseForm(prev => ({ ...prev, grade1st: e.target.value }))}
-                    className="input-field"
-                  >
-                    <option value="">Select Grade</option>
-                    {gradeOptions.map(grade => (
-                      <option key={grade} value={grade}>{grade}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    2nd Semester Grade
-                  </label>
-                  <select
-                    value={courseForm.grade2nd}
-                    onChange={(e) => setCourseForm(prev => ({ ...prev, grade2nd: e.target.value }))}
-                    className="input-field"
-                  >
-                    <option value="">Select Grade</option>
-                    {gradeOptions.map(grade => (
-                      <option key={grade} value={grade}>{grade}</option>
-                    ))}
-                  </select>
-                </div>
+              <div className="md:col-span-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  School Name *
+                </label>
+                <input
+                  type="text"
+                  value={courseForm.school}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, school: e.target.value }))}
+                  className="input-field"
+                  placeholder="e.g., Legend College Preparatory, Leigh High School, etc."
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter the full name of the school where this course was taken
+                </p>
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                School *
-              </label>
-              <select
-                value={courseForm.school}
-                onChange={(e) => setCourseForm(prev => ({ ...prev, school: e.target.value }))}
-                className="input-field"
-                required
-              >
-                <option value="">Select School</option>
-                {SCHOOL_OPTIONS.map(school => (
-                  <option key={school} value={school}>{school}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Real-time calculation preview for both semesters */}
-            {(courseForm.grade1st || courseForm.grade2nd) && (courseForm.credits || anyIPGrade) && (
+            {/* Real-time calculation preview */}
+            {courseForm.grade && (courseForm.credits || isIPGrade) && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <div className="text-sm text-blue-900">
-                  <strong>Course Preview:</strong> {getCourseLevelName(courseForm.hap)}
-                  {courseForm.grade1st && (
-                    <div>
-                      • 1st Semester: Grade Points: {getCurrentGradePoints(courseForm.grade1st).toFixed(2)} • 
-                      Weighted Points: {getCurrentCoursePoints(courseForm.grade1st).toFixed(2)}
-                      {!isGradeCountedForGPA(courseForm.grade1st) && (
-                        <span className="text-red-600 font-bold"> • NOT COUNTED IN GPA</span>
-                      )}
-                      {courseForm.grade1st === 'P' && (
-                        <span className="text-orange-600 font-bold"> • PASS GRADE (Credits earned, no GPA impact)</span>
-                      )}
-                    </div>
+                  <strong>Course Preview:</strong> {getCourseLevelName(courseForm.hap)} • 
+                  Grade Points: {getCurrentGradePoints().toFixed(2)} • 
+                  Weighted Points: {getCurrentCoursePoints().toFixed(2)}
+                  {!isGradeCountedForGPA(courseForm.grade) && (
+                    <span className="text-red-600 font-bold"> • NOT COUNTED IN GPA (IP/Special Grade)</span>
                   )}
-                  {courseForm.grade2nd && (
-                    <div>
-                      • 2nd Semester: Grade Points: {getCurrentGradePoints(courseForm.grade2nd).toFixed(2)} • 
-                      Weighted Points: {getCurrentCoursePoints(courseForm.grade2nd).toFixed(2)}
-                      {!isGradeCountedForGPA(courseForm.grade2nd) && (
-                        <span className="text-red-600 font-bold"> • NOT COUNTED IN GPA</span>
-                      )}
-                      {courseForm.grade2nd === 'P' && (
-                        <span className="text-orange-600 font-bold"> • PASS GRADE (Credits earned, no GPA impact)</span>
-                      )}
-                    </div>
+                  {!isGradeCountedForCredits(courseForm.grade) && (
+                    <span className="text-red-600 font-bold"> • NOT COUNTED FOR CREDITS</span>
                   )}
                 </div>
               </div>
@@ -510,9 +420,7 @@ const CoursesForm = () => {
                                     <td className="px-4 py-4 text-sm text-gray-900">
                                       {course.courseTitle}
                                       {!countsForGPA && (
-                                        <div className="text-xs text-red-600 font-medium">
-                                          {course.grade === 'P' ? 'Pass grade - not counted in GPA' : 'Not counted in GPA'}
-                                        </div>
+                                        <div className="text-xs text-red-600 font-medium">Not counted in GPA</div>
                                       )}
                                     </td>
                                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -600,9 +508,9 @@ const CoursesForm = () => {
             <h4 className="text-sm font-medium text-blue-900 mb-2">Grade Legend</h4>
             <div className="text-sm text-blue-800 space-y-1">
               <p>• <strong>IP (In Progress):</strong> Course is ongoing - NOT counted in GPA or credits</p>
-              <p>• <strong>P (Pass):</strong> Passing grade - counts for credits but NOT counted in GPA calculation</p>
-              <p>• <strong>F (Fail):</strong> Failing grade - counts for credits and GPA (0.0 points)</p>
-              <p>• <strong>Letter Grades (A+ through D-):</strong> Count for both credits and GPA calculation</p>
+              <p>• <strong>P (Pass):</strong> Passing grade - counts for credits and GPA (4.0 points)</p>
+              <p>• <strong>F (Fail):</strong> Failing grade - counts for credits but 0.0 GPA points</p>
+              <p>• <strong>NC:</strong> Not Counted - shown in parentheses for excluded grades</p>
             </div>
           </div>
         </div>
