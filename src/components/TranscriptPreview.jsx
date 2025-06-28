@@ -248,9 +248,10 @@ const TranscriptPreview = () => {
               border: '1px solid #000',
               padding: '8px',
               fontSize: '9px',
-              verticalAlign: 'top'
+              verticalAlign: 'top',
+              textAlign: 'center' // ✅ CENTERED CONTENT
             }}>
-              {/* ✅ CREDIT TRANSFER CONTENT - NO INTERNAL BORDERS */}
+              {/* ✅ CREDIT TRANSFER CONTENT - CENTERED */}
               <div style={{ width: '100%' }}>
                 {displayedCreditTransfer.length > 0 ? (
                   displayedCreditTransfer.map((transfer, index) => (
