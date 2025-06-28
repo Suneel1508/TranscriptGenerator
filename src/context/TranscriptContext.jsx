@@ -46,11 +46,16 @@ const TranscriptProvider = ({ children }) => {
     // Comments
     comments: '',
     
-    // Enrollment Summary
+    // Enrollment Summary (Block 1)
     enrollmentSummary: [
       { startEndDate: '', grade: '', school: '' },
       { startEndDate: '', grade: '', school: '' },
       { startEndDate: '', grade: '', school: '' }
+    ],
+    
+    // Credit Transfer (Block 2) - NEW
+    creditTransfer: [
+      { school: '', credits: 0 }
     ],
     
     // Credit Summary
@@ -238,6 +243,9 @@ const TranscriptProvider = ({ children }) => {
         { startEndDate: '', grade: '', school: '' },
         { startEndDate: '', grade: '', school: '' },
         { startEndDate: '', grade: '', school: '' }
+      ],
+      creditTransfer: [
+        { school: '', credits: 0 }
       ],
       creditSummary: [
         { subject: 'History/Social Science', earned: 0, required: 0 },

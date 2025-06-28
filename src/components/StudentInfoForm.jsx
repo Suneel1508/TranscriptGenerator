@@ -32,6 +32,25 @@ const StudentInfoForm = () => {
     }
   }
 
+  // CREDIT TRANSFER MANAGEMENT FUNCTIONS
+  const handleCreditTransferChange = (index, field, value) => {
+    const newCreditTransfer = [...(transcriptData.creditTransfer || [])]
+    newCreditTransfer[index] = { ...newCreditTransfer[index], [field]: value }
+    updateTranscriptData({ creditTransfer: newCreditTransfer })
+  }
+
+  const addCreditTransferEntry = () => {
+    const newCreditTransfer = [...(transcriptData.creditTransfer || []), { school: '', credits: 0 }]
+    updateTranscriptData({ creditTransfer: newCreditTransfer })
+  }
+
+  const removeCreditTransferEntry = (index) => {
+    if ((transcriptData.creditTransfer || []).length > 1) {
+      const newCreditTransfer = transcriptData.creditTransfer.filter((_, i) => i !== index)
+      updateTranscriptData({ creditTransfer: newCreditTransfer })
+    }
+  }
+
   // DYNAMIC CREDIT SUMMARY FUNCTIONS
   const handleCreditSummaryChange = (index, field, value) => {
     const newCreditSummary = [...transcriptData.creditSummary]
@@ -258,10 +277,10 @@ const StudentInfoForm = () => {
         </div>
       </div>
 
-      {/* DYNAMIC Enrollment Summary */}
+      {/* DYNAMIC Enrollment Summary - BLOCK 1 */}
       <div className="bg-gray-50 p-4 rounded-lg">
         <div className="flex items-center justify-between mb-4">
-          <h4 className="text-md font-medium text-gray-900">Enrollment Summary</h4>
+          <h4 className="text-md font-medium text-gray-900">Enrollment Summary (Block 1)</h4>
           <button
             type="button"
             onClick={addEnrollmentEntry}
@@ -329,12 +348,91 @@ const StudentInfoForm = () => {
         
         <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
           <p className="text-sm text-blue-800">
-            <strong>Tip:</strong> Add all schools the student attended. Each entry will appear in the enrollment summary section of the transcript.
+            <strong>Block 1:</strong> Add all schools the student attended with dates and grade levels. This appears on the left side of the enrollment section.
           </p>
         </div>
       </div>
 
-      {/* DYNAMIC Credit Summary - COMPLETELY REDESIGNED */}
+      {/* NEW: DYNAMIC Credit Transfer Management - BLOCK 2 */}
+      <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-md font-medium text-gray-900">Total Credit Transferred (Block 2)</h4>
+          <button
+            type="button"
+            onClick={addCreditTransferEntry}
+            className="btn-primary flex items-center space-x-2 text-sm"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Add School Credit</span>
+          </button>
+        </div>
+        
+        <div className="space-y-4">
+          {(transcriptData.creditTransfer || []).map((transfer, index) => (
+            <div key={index} className="grid md:grid-cols-3 gap-4 p-3 bg-white rounded border">
+              <div className="md:col-span-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  School Name
+                </label>
+                <input
+                  type="text"
+                  value={transfer.school}
+                  onChange={(e) => handleCreditTransferChange(index, 'school', e.target.value)}
+                  className="input-field"
+                  placeholder="e.g., Leigh High School"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Credits Transferred
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={transfer.credits}
+                  onChange={(e) => handleCreditTransferChange(index, 'credits', parseInt(e.target.value) || 0)}
+                  className="input-field"
+                  placeholder="e.g., 150"
+                />
+              </div>
+              <div className="flex items-end">
+                {(transcriptData.creditTransfer || []).length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeCreditTransferEntry(index)}
+                    className="btn-secondary text-red-600 hover:text-red-800 hover:bg-red-50 flex items-center space-x-1"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span>Remove</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+          
+          {/* Add default entry if none exist */}
+          {(!transcriptData.creditTransfer || transcriptData.creditTransfer.length === 0) && (
+            <div className="text-center py-4 border-2 border-dashed border-yellow-300 rounded">
+              <p className="text-gray-600 mb-2">No credit transfers added yet</p>
+              <button
+                type="button"
+                onClick={addCreditTransferEntry}
+                className="btn-primary text-sm"
+              >
+                Add First Credit Transfer
+              </button>
+            </div>
+          )}
+        </div>
+        
+        <div className="mt-4 p-3 bg-yellow-100 border border-yellow-300 rounded">
+          <p className="text-sm text-yellow-800">
+            <strong>Block 2:</strong> Add schools and the total credits transferred from each. This appears on the right side of the enrollment section, separated by a line from Block 1.
+          </p>
+        </div>
+      </div>
+
+      {/* DYNAMIC Credit Summary */}
       <div className="bg-gray-50 p-4 rounded-lg">
         <div className="flex items-center justify-between mb-4">
           <h4 className="text-md font-medium text-gray-900">Credit Summary</h4>

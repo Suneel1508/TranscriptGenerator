@@ -43,19 +43,6 @@ const TranscriptPreview = () => {
   const schoolGroups = groupCoursesBySchoolAndSemester()
   const semesterGPAs = calculateSemesterGPA(transcriptData.courses, true)
 
-  // Get unique schools from enrollment summary for credit transfer
-  const getUniqueSchools = () => {
-    const schools = new Set()
-    transcriptData.enrollmentSummary.forEach(enrollment => {
-      if (enrollment.school && enrollment.school.trim()) {
-        schools.add(enrollment.school.trim())
-      }
-    })
-    return Array.from(schools)
-  }
-
-  const uniqueSchools = getUniqueSchools()
-
   // Filter out empty credit summary entries for PDF display
   const getDisplayedCreditSummary = () => {
     return transcriptData.creditSummary.filter(credit => 
@@ -64,6 +51,15 @@ const TranscriptPreview = () => {
   }
 
   const displayedCreditSummary = getDisplayedCreditSummary()
+
+  // Get credit transfer data for display
+  const getDisplayedCreditTransfer = () => {
+    return (transcriptData.creditTransfer || []).filter(transfer => 
+      transfer.school && transfer.school.trim() !== ''
+    )
+  }
+
+  const displayedCreditTransfer = getDisplayedCreditTransfer()
 
   return (
     <div 
@@ -150,7 +146,7 @@ const TranscriptPreview = () => {
             <tbody>
               <tr>
                 <td style={{ 
-                  border: '1px solid #000', 
+                  border: 'none', 
                   padding: '8px', 
                   backgroundColor: '#f0f0f0', 
                   fontWeight: 'bold',
@@ -161,7 +157,7 @@ const TranscriptPreview = () => {
               </tr>
               <tr>
                 <td style={{ 
-                  border: '1px solid #000', 
+                  border: 'none', 
                   padding: '8px',
                   fontSize: '10px'
                 }}>
@@ -171,127 +167,81 @@ const TranscriptPreview = () => {
             </tbody>
           </table>
 
-          {/* Enrollment Summary Block - Split into TWO blocks */}
-          <div style={{ display: 'flex', gap: '0px' }}>
-            {/* Block 1: Enrollment Details (Left) */}
-            <div style={{ width: '70%' }}>
-              <table style={{ 
-                width: '100%', 
-                borderCollapse: 'collapse',
-                border: '2px solid #000',
-                borderTop: 'none'
-              }}>
-                <tbody>
-                  <tr>
-                    <td style={{ 
-                      padding: '8px', 
-                      backgroundColor: '#f0f0f0', 
-                      fontWeight: 'bold',
-                      fontSize: '10px'
-                    }} colSpan="3">
-                      Enrollment Summary
-                    </td>
-                  </tr>
-                  <tr style={{ backgroundColor: '#f8f8f8' }}>
-                    <td style={{ 
-                      padding: '5px', 
-                      fontWeight: 'bold',
-                      fontSize: '9px',
-                      width: '35%'
-                    }}>
-                      Start/End Date
-                    </td>
-                    <td style={{ 
-                      padding: '5px', 
-                      fontWeight: 'bold',
-                      fontSize: '9px',
-                      width: '20%'
-                    }}>
-                      Grade
-                    </td>
-                    <td style={{ 
-                      padding: '5px', 
-                      fontWeight: 'bold',
-                      fontSize: '9px',
-                      width: '45%'
-                    }}>
-                      School
-                    </td>
-                  </tr>
-                  {transcriptData.enrollmentSummary.slice(0, 7).map((enrollment, index) => (
-                    <tr key={index}>
-                      <td style={{ 
-                        padding: '5px',
-                        fontSize: '9px'
-                      }}>
-                        {enrollment.startEndDate || (index === 0 ? '2016-2017' : index === 1 ? '2016-2017' : index === 2 ? '2017-2018' : index === 3 ? '2017-2018' : index === 4 ? '2017-2018' : index === 5 ? '2016-2017' : '2016-2017')}
-                      </td>
-                      <td style={{ 
-                        padding: '5px',
-                        fontSize: '9px'
-                      }}>
-                        {enrollment.grade || (index === 0 ? '9' : index === 1 ? '9' : index === 2 ? '10' : index === 3 ? '10' : index === 4 ? '10' : index === 5 ? '11' : '11')}
-                      </td>
-                      <td style={{ 
-                        padding: '5px',
-                        fontSize: '9px'
-                      }}>
-                        {enrollment.school || (index === 0 ? 'Leigh High School' : index === 1 ? 'Foothill College' : index === 2 ? 'Leigh High School' : index === 3 ? 'Foothill College' : index === 4 ? 'De Anza College' : index === 5 ? 'Legend College Preparatory' : 'Leigh High School')}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Block 2: Total Credit Transfer (Right) - ONLY ONE SEPARATOR LINE */}
-            <div style={{ width: '30%' }}>
-              <table style={{ 
-                width: '100%', 
-                borderCollapse: 'collapse',
-                border: '2px solid #000',
-                borderTop: 'none',
-                borderLeft: '1px solid #000'
-              }}>
-                <tbody>
-                  <tr>
-                    <td style={{ 
-                      padding: '8px', 
-                      backgroundColor: '#f0f0f0', 
-                      fontWeight: 'bold',
-                      fontSize: '10px'
-                    }}>
-                      Total Credit Transferred
-                    </td>
-                  </tr>
-                  {uniqueSchools.map((school, index) => (
-                    <tr key={index}>
-                      <td style={{ 
-                        padding: '5px',
-                        fontSize: '9px'
-                      }}>
-                        {school.includes('Leigh High School') ? '150 Leigh High School' :
-                         school.includes('Foothill College') ? '30 Foothill College' :
-                         school.includes('De Anza College') ? '10 De Anza College' :
-                         `0 ${school}`}
-                      </td>
-                    </tr>
-                  ))}
-                  {/* Fill empty rows if needed */}
-                  {Array.from({ length: Math.max(0, 7 - uniqueSchools.length) }, (_, i) => (
-                    <tr key={`empty-${i}`}>
-                      <td style={{ 
-                        padding: '5px',
-                        fontSize: '9px'
-                      }}>
-                        &nbsp;
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          {/* Enrollment Summary Block 1 - NO INTERNAL GRID LINES */}
+          <table style={{ 
+            width: '100%', 
+            borderCollapse: 'collapse',
+            border: '2px solid #000',
+            borderTop: 'none'
+          }}>
+            <tbody>
+              <tr>
+                <td style={{ 
+                  padding: '8px', 
+                  backgroundColor: '#f0f0f0', 
+                  fontWeight: 'bold',
+                  fontSize: '10px',
+                  border: 'none'
+                }} colSpan="3">
+                  Enrollment Summary
+                </td>
+              </tr>
+              <tr style={{ backgroundColor: '#f8f8f8' }}>
+                <td style={{ 
+                  padding: '5px', 
+                  fontWeight: 'bold',
+                  fontSize: '9px',
+                  width: '35%',
+                  border: 'none'
+                }}>
+                  Start/End Date
+                </td>
+                <td style={{ 
+                  padding: '5px', 
+                  fontWeight: 'bold',
+                  fontSize: '9px',
+                  width: '20%',
+                  border: 'none'
+                }}>
+                  Grade
+                </td>
+                <td style={{ 
+                  padding: '5px', 
+                  fontWeight: 'bold',
+                  fontSize: '9px',
+                  width: '45%',
+                  border: 'none'
+                }}>
+                  School
+                </td>
+              </tr>
+              {transcriptData.enrollmentSummary.slice(0, 7).map((enrollment, index) => (
+                <tr key={index}>
+                  <td style={{ 
+                    padding: '5px',
+                    fontSize: '9px',
+                    border: 'none'
+                  }}>
+                    {enrollment.startEndDate || (index === 0 ? '2016-2017' : index === 1 ? '2016-2017' : index === 2 ? '2017-2018' : index === 3 ? '2017-2018' : index === 4 ? '2017-2018' : index === 5 ? '2016-2017' : '2016-2017')}
+                  </td>
+                  <td style={{ 
+                    padding: '5px',
+                    fontSize: '9px',
+                    border: 'none'
+                  }}>
+                    {enrollment.grade || (index === 0 ? '9' : index === 1 ? '9' : index === 2 ? '10' : index === 3 ? '10' : index === 4 ? '10' : index === 5 ? '11' : '11')}
+                  </td>
+                  <td style={{ 
+                    padding: '5px',
+                    fontSize: '9px',
+                    border: 'none'
+                  }}>
+                    {enrollment.school || (index === 0 ? 'Leigh High School' : index === 1 ? 'Foothill College' : index === 2 ? 'Leigh High School' : index === 3 ? 'Foothill College' : index === 4 ? 'De Anza College' : index === 5 ? 'Legend College Preparatory' : 'Leigh High School')}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* RIGHT SIDE */}
@@ -310,7 +260,8 @@ const TranscriptPreview = () => {
                   padding: '8px', 
                   backgroundColor: '#f0f0f0', 
                   fontWeight: 'bold',
-                  fontSize: '10px'
+                  fontSize: '10px',
+                  border: 'none'
                 }}>
                   Total Credit Completed
                 </td>
@@ -318,7 +269,8 @@ const TranscriptPreview = () => {
               <tr>
                 <td style={{ 
                   padding: '8px',
-                  fontSize: '10px'
+                  fontSize: '10px',
+                  border: 'none'
                 }}>
                   {transcriptData.totalCredits || '20'} {transcriptData.institutionName || 'Legend College Preparatory'}
                 </td>
@@ -326,13 +278,84 @@ const TranscriptPreview = () => {
             </tbody>
           </table>
 
-          {/* Additional space to align with left side */}
-          <div style={{ 
-            height: '200px',
+          {/* Total Credit Transferred Block 2 - COMPLETELY SEPARATE */}
+          <table style={{ 
+            width: '100%', 
+            borderCollapse: 'collapse',
             border: '2px solid #000',
             borderTop: 'none',
             borderLeft: '1px solid #000'
-          }}></div>
+          }}>
+            <tbody>
+              <tr>
+                <td style={{ 
+                  padding: '8px', 
+                  backgroundColor: '#f0f0f0', 
+                  fontWeight: 'bold',
+                  fontSize: '10px',
+                  border: 'none'
+                }}>
+                  Total Credit Transferred
+                </td>
+              </tr>
+              {displayedCreditTransfer.length > 0 ? (
+                displayedCreditTransfer.map((transfer, index) => (
+                  <tr key={index}>
+                    <td style={{ 
+                      padding: '5px',
+                      fontSize: '9px',
+                      border: 'none'
+                    }}>
+                      {transfer.credits} {transfer.school}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                // Default entries if none are added
+                <>
+                  <tr>
+                    <td style={{ 
+                      padding: '5px',
+                      fontSize: '9px',
+                      border: 'none'
+                    }}>
+                      150 Leigh High School
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ 
+                      padding: '5px',
+                      fontSize: '9px',
+                      border: 'none'
+                    }}>
+                      30 Foothill College
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ 
+                      padding: '5px',
+                      fontSize: '9px',
+                      border: 'none'
+                    }}>
+                      10 De Anza College
+                    </td>
+                  </tr>
+                </>
+              )}
+              {/* Fill remaining rows to match left side height */}
+              {Array.from({ length: Math.max(0, 7 - Math.max(displayedCreditTransfer.length, 3)) }, (_, i) => (
+                <tr key={`empty-${i}`}>
+                  <td style={{ 
+                    padding: '5px',
+                    fontSize: '9px',
+                    border: 'none'
+                  }}>
+                    &nbsp;
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -350,7 +373,8 @@ const TranscriptPreview = () => {
               backgroundColor: '#f0f0f0', 
               fontWeight: 'bold',
               textAlign: 'center',
-              fontSize: '10px'
+              fontSize: '10px',
+              border: 'none'
             }} colSpan="2">
               Credit Summary<br />
               Curriculum Track: College Prep, Honors
@@ -361,7 +385,8 @@ const TranscriptPreview = () => {
               padding: '8px',
               width: '50%',
               fontSize: '9px',
-              verticalAlign: 'top'
+              verticalAlign: 'top',
+              border: 'none'
             }}>
               {/* Left Block - Show actual entered courses or defaults */}
               {displayedCreditSummary.length > 0 ? (
@@ -401,7 +426,9 @@ const TranscriptPreview = () => {
               padding: '8px',
               width: '50%',
               fontSize: '9px',
-              verticalAlign: 'top'
+              verticalAlign: 'top',
+              border: 'none',
+              borderLeft: '1px solid #000'
             }}>
               {/* Right Block - Show actual entered courses or defaults */}
               {displayedCreditSummary.length > 0 ? (
