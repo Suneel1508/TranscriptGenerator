@@ -17,24 +17,45 @@ const TranscriptPreview = () => {
     })
   }
 
-  // Group courses by semester for the new table structure
-  const groupCoursesBySemester = () => {
-    const grouped = {}
+  // Group courses by semester and grade level for side-by-side display
+  const groupCoursesForSideBySide = () => {
+    const semesters = {
+      '1st': {},
+      '2nd': {}
+    }
+    
     transcriptData.courses.forEach(course => {
-      const key = course.semester
-      if (!grouped[key]) {
-        grouped[key] = {
-          semester: course.semester,
+      const semester = course.semester
+      const gradeKey = `${course.gradeLevel}-${course.schoolYear}`
+      
+      if (!semesters[semester][gradeKey]) {
+        semesters[semester][gradeKey] = {
+          gradeLevel: course.gradeLevel,
+          schoolYear: course.schoolYear,
           courses: []
         }
       }
-      grouped[key].courses.push(course)
+      semesters[semester][gradeKey].courses.push(course)
     })
-    return Object.values(grouped).sort((a, b) => a.semester.localeCompare(b.semester))
+    
+    return semesters
   }
 
-  const semesterGroups = groupCoursesBySemester()
+  const semesterData = groupCoursesForSideBySide()
   const semesterGPAs = calculateSemesterGPA(transcriptData.courses, true)
+
+  // Get all unique grade levels across both semesters for proper row alignment
+  const getAllGradeLevels = () => {
+    const gradeLevels = new Set()
+    Object.values(semesterData).forEach(semester => {
+      Object.keys(semester).forEach(gradeKey => {
+        gradeLevels.add(gradeKey)
+      })
+    })
+    return Array.from(gradeLevels).sort()
+  }
+
+  const allGradeLevels = getAllGradeLevels()
 
   return (
     <div className="transcript-preview bg-white p-6 min-h-[800px]" id="transcript-preview" style={{ fontFamily: 'Arial, sans-serif', fontSize: '11px', lineHeight: '1.2', color: 'black' }}>
@@ -188,82 +209,162 @@ const TranscriptPreview = () => {
         </div>
       </div>
 
-      {/* Course Records - NEW TABLE STRUCTURE */}
-      {semesterGroups.length > 0 && (
+      {/* Course Records - SIDE BY SIDE SEMESTER LAYOUT */}
+      {(Object.keys(semesterData['1st']).length > 0 || Object.keys(semesterData['2nd']).length > 0) && (
         <div style={{ marginBottom: '20px' }}>
-          {semesterGroups.map((semesterGroup, semesterIndex) => {
-            // Group courses by grade level within semester
-            const gradeGroups = {}
-            semesterGroup.courses.forEach(course => {
-              const gradeKey = `${course.gradeLevel}-${course.schoolYear}`
-              if (!gradeGroups[gradeKey]) {
-                gradeGroups[gradeKey] = {
-                  gradeLevel: course.gradeLevel,
-                  schoolYear: course.schoolYear,
-                  courses: []
-                }
-              }
-              gradeGroups[gradeKey].courses.push(course)
-            })
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px', border: '2px solid black' }}>
+            <tbody>
+              {/* Main Header Row */}
+              <tr>
+                <td style={{ padding: '4px 8px', fontWeight: 'bold', backgroundColor: '#f0f0f0', borderBottom: '1px solid black', width: '50%' }}>
+                  1st Semester:
+                </td>
+                <td style={{ padding: '4px 8px', fontWeight: 'bold', backgroundColor: '#f0f0f0', borderBottom: '1px solid black', borderLeft: '1px solid black', width: '50%' }}>
+                  2nd Semester:
+                </td>
+              </tr>
+              
+              {/* Column Headers Row */}
+              <tr style={{ backgroundColor: '#f5f5f5' }}>
+                {/* 1st Semester Headers */}
+                <td style={{ padding: '0', border: 'none', width: '50%' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '15%' }}>Grade Level</td>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '15%' }}>School Year</td>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '35%' }}>Course Title</td>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '15%' }}>H/AP</td>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '10%' }}>Grade</td>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '10%' }}>Credits</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                {/* 2nd Semester Headers */}
+                <td style={{ padding: '0', border: 'none', borderLeft: '1px solid black', width: '50%' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '15%' }}>Grade Level</td>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '15%' }}>School Year</td>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '35%' }}>Course Title</td>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '15%' }}>H/AP</td>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '10%' }}>Grade</td>
+                        <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '10%' }}>Credits</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
 
-            return (
-              <div key={semesterIndex} style={{ marginBottom: '15px' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px', border: '2px solid black' }}>
-                  <tbody>
-                    {/* Semester Header */}
-                    <tr>
-                      <td style={{ padding: '4px 8px', fontWeight: 'bold', backgroundColor: '#f0f0f0', borderBottom: '1px solid black' }} colSpan="6">
-                        {semesterGroup.semester} Semester:
+              {/* School Name Row */}
+              <tr>
+                <td style={{ padding: '2px 4px', textAlign: 'center', fontWeight: 'bold', border: '1px solid black' }} colSpan="1">
+                  #{transcriptData.institutionName || 'Legend College Preparatory'}
+                </td>
+                <td style={{ padding: '2px 4px', textAlign: 'center', fontWeight: 'bold', border: '1px solid black', borderLeft: '1px solid black' }} colSpan="1">
+                  #{transcriptData.institutionName || 'Legend College Preparatory'}
+                </td>
+              </tr>
+
+              {/* Course Rows by Grade Level */}
+              {allGradeLevels.map((gradeKey, gradeIndex) => {
+                const firstSemesterGrade = semesterData['1st'][gradeKey]
+                const secondSemesterGrade = semesterData['2nd'][gradeKey]
+                const maxCourses = Math.max(
+                  firstSemesterGrade?.courses.length || 0,
+                  secondSemesterGrade?.courses.length || 0
+                )
+
+                const rows = []
+                
+                // Add course rows
+                for (let i = 0; i < maxCourses; i++) {
+                  const firstCourse = firstSemesterGrade?.courses[i]
+                  const secondCourse = secondSemesterGrade?.courses[i]
+                  
+                  rows.push(
+                    <tr key={`${gradeKey}-${i}`}>
+                      {/* 1st Semester Course */}
+                      <td style={{ padding: '0', border: 'none', width: '50%' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                          <tbody>
+                            <tr>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '15%' }}>
+                                {firstCourse ? firstCourse.gradeLevel : ''}
+                              </td>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '15%' }}>
+                                {firstCourse ? `'${firstCourse.schoolYear}` : ''}
+                              </td>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '35%' }}>
+                                {firstCourse ? firstCourse.courseTitle : ''}
+                              </td>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '15%' }}>
+                                {firstCourse ? (firstCourse.hap || '') : ''}
+                              </td>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '10%' }}>
+                                {firstCourse ? firstCourse.grade : ''}
+                              </td>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '10%' }}>
+                                {firstCourse ? (firstCourse.grade === 'IP' ? '' : firstCourse.credits) : ''}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                      {/* 2nd Semester Course */}
+                      <td style={{ padding: '0', border: 'none', borderLeft: '1px solid black', width: '50%' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                          <tbody>
+                            <tr>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '15%' }}>
+                                {secondCourse ? secondCourse.gradeLevel : ''}
+                              </td>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '15%' }}>
+                                {secondCourse ? `'${secondCourse.schoolYear}` : ''}
+                              </td>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '35%' }}>
+                                {secondCourse ? secondCourse.courseTitle : ''}
+                              </td>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '15%' }}>
+                                {secondCourse ? (secondCourse.hap || '') : ''}
+                              </td>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '10%' }}>
+                                {secondCourse ? secondCourse.grade : ''}
+                              </td>
+                              <td style={{ padding: '2px 4px', border: '1px solid black', width: '10%' }}>
+                                {secondCourse ? (secondCourse.grade === 'IP' ? '' : secondCourse.credits) : ''}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </td>
                     </tr>
-                    
-                    {/* Column Headers */}
-                    <tr style={{ backgroundColor: '#f5f5f5' }}>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '12%' }}>Grade Level</td>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '15%' }}>School Year</td>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '35%' }}>Course Title</td>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '10%' }}>H/AP</td>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '10%' }}>Grade</td>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '18%' }}>Credits</td>
-                    </tr>
+                  )
+                }
 
-                    {/* Course Rows by Grade Level */}
-                    {Object.values(gradeGroups)
-                      .sort((a, b) => a.gradeLevel - b.gradeLevel)
-                      .map((gradeGroup, gradeIndex) => {
-                        const gradeKey = `${gradeGroup.gradeLevel}-${gradeGroup.schoolYear}-${semesterGroup.semester}`
-                        const gradeGPA = semesterGPAs[gradeKey]
-                        
-                        return (
-                          <React.Fragment key={gradeIndex}>
-                            {gradeGroup.courses.map((course, courseIndex) => (
-                              <tr key={courseIndex}>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.gradeLevel}</td>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>'{course.schoolYear}</td>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.courseTitle}</td>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.hap || ''}</td>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.grade}</td>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>
-                                  {isGradeCountedForGPA(course.grade) ? course.credits : ''}
-                                </td>
-                              </tr>
-                            ))}
-                            {/* Semester GPA Row for this grade level */}
-                            {gradeGPA && (
-                              <tr style={{ backgroundColor: '#f9f9f9' }}>
-                                <td colSpan="6" style={{ padding: '3px 4px', fontWeight: 'bold', fontSize: '8px', border: '1px solid black' }}>
-                                  Sem. GPA (Weighted): {gradeGPA.gpa.toFixed(2)}
-                                </td>
-                              </tr>
-                            )}
-                          </React.Fragment>
-                        )
-                      })}
-                  </tbody>
-                </table>
-              </div>
-            )
-          })}
+                // Add GPA rows for this grade level
+                const firstSemesterGPA = semesterGPAs[`${gradeKey}-1st`]
+                const secondSemesterGPA = semesterGPAs[`${gradeKey}-2nd`]
+                
+                if (firstSemesterGPA || secondSemesterGPA) {
+                  rows.push(
+                    <tr key={`${gradeKey}-gpa`} style={{ backgroundColor: '#f9f9f9' }}>
+                      <td style={{ padding: '3px 4px', fontWeight: 'bold', fontSize: '8px', border: '1px solid black' }}>
+                        {firstSemesterGPA ? `Sem. GPA (Weighted): ${firstSemesterGPA.gpa.toFixed(2)}` : ''}
+                      </td>
+                      <td style={{ padding: '3px 4px', fontWeight: 'bold', fontSize: '8px', border: '1px solid black', borderLeft: '1px solid black' }}>
+                        {secondSemesterGPA ? `Sem. GPA (Weighted): ${secondSemesterGPA.gpa.toFixed(2)}` : 'Sem. GPA (Weighted):'}
+                      </td>
+                    </tr>
+                  )
+                }
+
+                return rows
+              })}
+            </tbody>
+          </table>
         </div>
       )}
 
