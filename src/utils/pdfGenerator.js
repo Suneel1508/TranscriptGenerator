@@ -219,7 +219,8 @@ export const generatePDFViaPrint = async (transcriptData) => {
       <html>
       <head>
         <title>Official Transcript - ${transcriptData.studentName || 'Student'}</title>
-        
+        <style>
+        </style>
       </head>
       <body>
         ${element.outerHTML}
