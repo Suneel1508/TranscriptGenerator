@@ -205,12 +205,18 @@ export const generatePDF = async (transcriptData) => {
 // Alternative method using browser's native print functionality
 export const generatePDFViaPrint = async (transcriptData) => {
   try {
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank')
     const element = document.getElementById('transcript-preview')
     
-    if (!element || !printWindow) {
-      throw new Error('Unable to create print window')
+    if (!element) {
+      throw new Error('Transcript preview element not found')
+    }
+
+    // Attempt to create a new window for printing
+    const printWindow = window.open('', '_blank')
+    
+    // Check if the window was successfully created
+    if (!printWindow) {
+      throw new Error('Unable to open print window. This is likely due to a pop-up blocker. Please allow pop-ups for this site and try again, or use the regular PDF download option instead.')
     }
 
     // Enhanced print styles for perfect PDF output
@@ -220,6 +226,31 @@ export const generatePDFViaPrint = async (transcriptData) => {
       <head>
         <title>Official Transcript - ${transcriptData.studentName || 'Student'}</title>
         <style>
+          @page {
+            size: A4;
+            margin: 0.5in;
+          }
+          body {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            line-height: 1.2;
+            color: black;
+            background: white;
+            margin: 0;
+            padding: 0;
+          }
+          table {
+            border-collapse: collapse;
+            width: 100%;
+          }
+          th, td {
+            border: 1px solid black;
+            padding: 4px;
+            text-align: left;
+          }
+          .no-print {
+            display: none;
+          }
         </style>
       </head>
       <body>
