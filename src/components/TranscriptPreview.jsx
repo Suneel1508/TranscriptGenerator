@@ -43,32 +43,18 @@ const TranscriptPreview = () => {
   const schoolGroups = groupCoursesBySchoolAndSemester()
   const semesterGPAs = calculateSemesterGPA(transcriptData.courses, true)
 
-  // Calculate total credits transferred by school
-  const calculateCreditsBySchool = () => {
-    const creditsBySchool = {}
-    
-    // Sum credits from enrollment summary by school
+  // Get unique schools from enrollment summary for credit transfer
+  const getUniqueSchools = () => {
+    const schools = new Set()
     transcriptData.enrollmentSummary.forEach(enrollment => {
-      if (enrollment.school) {
-        const school = enrollment.school
-        if (!creditsBySchool[school]) {
-          creditsBySchool[school] = 0
-        }
-        // Extract credit numbers from existing data
-        if (school.includes('Leigh High School')) {
-          creditsBySchool[school] += 150
-        } else if (school.includes('Foothill College')) {
-          creditsBySchool[school] += 30
-        } else if (school.includes('De Anza College')) {
-          creditsBySchool[school] += 10
-        }
+      if (enrollment.school && enrollment.school.trim()) {
+        schools.add(enrollment.school.trim())
       }
     })
-    
-    return creditsBySchool
+    return Array.from(schools)
   }
 
-  const creditsBySchool = calculateCreditsBySchool()
+  const uniqueSchools = getUniqueSchools()
 
   // Filter out empty credit summary entries for PDF display
   const getDisplayedCreditSummary = () => {
@@ -108,7 +94,7 @@ const TranscriptPreview = () => {
         {transcriptData.institutionName || 'LEGEND COLLEGE PREPARATORY'} TRANSCRIPT
       </div>
 
-      {/* Institution Info */}
+      {/* Institution Info - ALL ON ONE LINE */}
       <div style={{ 
         textAlign: 'center', 
         marginBottom: '20px', 
@@ -125,296 +111,237 @@ const TranscriptPreview = () => {
         </div>
       </div>
 
-      {/* Student Information */}
-      <table style={{ 
-        width: '100%', 
-        borderCollapse: 'collapse', 
+      {/* Student Information Block - NO GRID LINES */}
+      <div style={{ 
         marginBottom: '20px',
-        border: '2px solid #000'
+        padding: '10px',
+        backgroundColor: '#f8f8f8'
       }}>
-        <tbody>
-          <tr>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px', 
-              fontWeight: 'bold',
-              width: '20%',
-              fontSize: '10px'
-            }}>
-              Student Name:
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px',
-              width: '30%',
-              fontSize: '10px'
-            }}>
-              {transcriptData.studentName || 'Kondor, Anirud'}
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px', 
-              fontWeight: 'bold',
-              width: '20%',
-              fontSize: '10px'
-            }}>
-              Student Number:
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px',
-              width: '30%',
-              fontSize: '10px'
-            }}>
-              {transcriptData.studentNumber || '11807'}
-            </td>
-          </tr>
-          <tr>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px', 
-              fontWeight: 'bold',
-              fontSize: '10px'
-            }}>
-              Address:
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px',
-              fontSize: '10px'
-            }} colSpan="3">
-              {transcriptData.address || '4848 Tilden Dr., San Jose, CA 95124'}
-            </td>
-          </tr>
-          <tr>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px', 
-              fontWeight: 'bold',
-              fontSize: '10px'
-            }}>
-              Date of Birth:
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px',
-              fontSize: '10px'
-            }}>
-              {formatDate(transcriptData.dateOfBirth) || 'April 25, 2002'}
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px', 
-              fontWeight: 'bold',
-              fontSize: '10px'
-            }}>
-              Gender:
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px',
-              fontSize: '10px'
-            }}>
-              {transcriptData.gender || 'Male'}
-            </td>
-          </tr>
-          <tr>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px', 
-              fontWeight: 'bold',
-              fontSize: '10px'
-            }}>
-              Guardian:
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px',
-              fontSize: '10px'
-            }}>
-              {transcriptData.guardian || 'Padman Kondor, Sangeetha Kondor'}
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px', 
-              fontWeight: 'bold',
-              fontSize: '10px'
-            }}>
-              SSN:
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px',
-              fontSize: '10px'
-            }}>
-              {formatSSNForDisplay(transcriptData.ssn)}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        <div style={{ display: 'flex', marginBottom: '8px' }}>
+          <span style={{ fontWeight: 'bold', width: '20%', fontSize: '10px' }}>Student Name:</span>
+          <span style={{ width: '30%', fontSize: '10px' }}>{transcriptData.studentName || 'Kondor, Anirud'}</span>
+          <span style={{ fontWeight: 'bold', width: '20%', fontSize: '10px' }}>Student Number:</span>
+          <span style={{ width: '30%', fontSize: '10px' }}>{transcriptData.studentNumber || '11807'}</span>
+        </div>
+        <div style={{ display: 'flex', marginBottom: '8px' }}>
+          <span style={{ fontWeight: 'bold', width: '20%', fontSize: '10px' }}>Address:</span>
+          <span style={{ width: '80%', fontSize: '10px' }}>{transcriptData.address || '4848 Tilden Dr., San Jose, CA 95124'}</span>
+        </div>
+        <div style={{ display: 'flex', marginBottom: '8px' }}>
+          <span style={{ fontWeight: 'bold', width: '20%', fontSize: '10px' }}>Date of Birth:</span>
+          <span style={{ width: '30%', fontSize: '10px' }}>{formatDate(transcriptData.dateOfBirth) || 'April 25, 2002'}</span>
+          <span style={{ fontWeight: 'bold', width: '20%', fontSize: '10px' }}>Gender:</span>
+          <span style={{ width: '30%', fontSize: '10px' }}>{transcriptData.gender || 'Male'}</span>
+        </div>
+        <div style={{ display: 'flex' }}>
+          <span style={{ fontWeight: 'bold', width: '20%', fontSize: '10px' }}>Guardian:</span>
+          <span style={{ width: '30%', fontSize: '10px' }}>{transcriptData.guardian || 'Padman Kondor, Sangeetha Kondor'}</span>
+          <span style={{ fontWeight: 'bold', width: '20%', fontSize: '10px' }}>SSN:</span>
+          <span style={{ width: '30%', fontSize: '10px' }}>{formatSSNForDisplay(transcriptData.ssn)}</span>
+        </div>
+      </div>
 
-      {/* GPA and Credit Summary */}
-      <table style={{ 
-        width: '100%', 
-        borderCollapse: 'collapse', 
-        marginBottom: '20px',
-        border: '2px solid #000'
-      }}>
-        <tbody>
-          <tr>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px', 
-              backgroundColor: '#f0f0f0', 
-              fontWeight: 'bold',
-              width: '50%',
-              fontSize: '10px'
-            }}>
-              GPA Summary
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px', 
-              backgroundColor: '#f0f0f0', 
-              fontWeight: 'bold',
-              width: '50%',
-              fontSize: '10px'
-            }}>
-              Total Credit Completed
-            </td>
-          </tr>
-          <tr>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px',
-              fontSize: '10px'
-            }}>
-              Cumulative GPA (Weighted): {transcriptData.cumulativeGPA || '4.33'}
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px',
-              fontSize: '10px'
-            }}>
-              {transcriptData.totalCredits || '20'} {transcriptData.institutionName || 'Legend College Preparatory'}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      {/* Enrollment Summary - FIXED: No internal lines, only separator before Total Credit Transferred */}
-      <table style={{ 
-        width: '100%', 
-        borderCollapse: 'collapse', 
-        marginBottom: '20px',
-        border: '2px solid #000'
-      }}>
-        <tbody>
-          <tr>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '8px', 
-              backgroundColor: '#f0f0f0', 
-              fontWeight: 'bold',
-              fontSize: '10px'
-            }} colSpan="4">
-              Enrollment Summary
-            </td>
-          </tr>
-          <tr style={{ backgroundColor: '#f8f8f8' }}>
-            <td style={{ 
-              border: '1px solid #000', 
-              borderRight: 'none', // Remove internal vertical lines
-              padding: '5px', 
-              fontWeight: 'bold',
-              fontSize: '9px',
-              width: '25%'
-            }}>
-              Start/End Date
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              borderLeft: 'none',
-              borderRight: 'none', // Remove internal vertical lines
-              padding: '5px', 
-              fontWeight: 'bold',
-              fontSize: '9px',
-              width: '15%'
-            }}>
-              Grade
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              borderLeft: 'none',
-              borderRight: '1px solid #000', // Keep separator before Total Credit Transferred
-              padding: '5px', 
-              fontWeight: 'bold',
-              fontSize: '9px',
-              width: '35%'
-            }}>
-              School
-            </td>
-            <td style={{ 
-              border: '1px solid #000', 
-              padding: '5px', 
-              fontWeight: 'bold',
-              fontSize: '9px',
-              width: '25%'
-            }}>
-              Total Credit Transferred
-            </td>
-          </tr>
-          {transcriptData.enrollmentSummary.slice(0, 7).map((enrollment, index) => {
-            // Calculate credit transfer display
-            let creditTransfer = ''
-            const school = enrollment.school || (index === 0 ? 'Leigh High School' : index === 1 ? 'Foothill College' : index === 2 ? 'Leigh High School' : index === 3 ? 'Foothill College' : index === 4 ? 'De Anza College' : index === 5 ? 'Legend College Preparatory' : 'Leigh High School')
-            
-            if (index === 0) creditTransfer = '150 Leigh High School'
-            else if (index === 1) creditTransfer = '30 Foothill College'
-            else if (index === 2) creditTransfer = '10 De Anza College'
-            
-            return (
-              <tr key={index}>
+      {/* MAIN LAYOUT: Left side (GPA + Enrollment) | Right side (Credit Completed + Credit Transfer) */}
+      <div style={{ display: 'flex', marginBottom: '20px', gap: '10px' }}>
+        {/* LEFT SIDE */}
+        <div style={{ width: '50%' }}>
+          {/* GPA Summary Block */}
+          <table style={{ 
+            width: '100%', 
+            borderCollapse: 'collapse', 
+            marginBottom: '10px',
+            border: '2px solid #000'
+          }}>
+            <tbody>
+              <tr>
                 <td style={{ 
                   border: '1px solid #000', 
-                  borderRight: 'none', // Remove internal vertical lines
-                  padding: '5px',
-                  fontSize: '9px'
+                  padding: '8px', 
+                  backgroundColor: '#f0f0f0', 
+                  fontWeight: 'bold',
+                  fontSize: '10px'
                 }}>
-                  {enrollment.startEndDate || (index === 0 ? '2016-2017' : index === 1 ? '2016-2017' : index === 2 ? '2017-2018' : index === 3 ? '2017-2018' : index === 4 ? '2017-2018' : index === 5 ? '2016-2017' : '2016-2017')}
-                </td>
-                <td style={{ 
-                  border: '1px solid #000', 
-                  borderLeft: 'none',
-                  borderRight: 'none', // Remove internal vertical lines
-                  padding: '5px',
-                  fontSize: '9px'
-                }}>
-                  {enrollment.grade || (index === 0 ? '9' : index === 1 ? '9' : index === 2 ? '10' : index === 3 ? '10' : index === 4 ? '10' : index === 5 ? '11' : '11')}
-                </td>
-                <td style={{ 
-                  border: '1px solid #000', 
-                  borderLeft: 'none',
-                  borderRight: '1px solid #000', // Keep separator before Total Credit Transferred
-                  padding: '5px',
-                  fontSize: '9px'
-                }}>
-                  {school}
-                </td>
-                <td style={{ 
-                  border: '1px solid #000', 
-                  padding: '5px',
-                  fontSize: '9px'
-                }}>
-                  {creditTransfer}
+                  GPA Summary
                 </td>
               </tr>
-            )
-          })}
-        </tbody>
-      </table>
+              <tr>
+                <td style={{ 
+                  border: '1px solid #000', 
+                  padding: '8px',
+                  fontSize: '10px'
+                }}>
+                  Cumulative GPA (Weighted): {transcriptData.cumulativeGPA || '4.33'}
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
-      {/* Credit Summary - FIXED: Only show actual courses, no empty placeholders */}
+          {/* Enrollment Summary Block - Split into TWO blocks */}
+          <div style={{ display: 'flex', gap: '1px' }}>
+            {/* Block 1: Enrollment Details (Left) */}
+            <div style={{ width: '70%' }}>
+              <table style={{ 
+                width: '100%', 
+                borderCollapse: 'collapse',
+                border: '2px solid #000'
+              }}>
+                <tbody>
+                  <tr>
+                    <td style={{ 
+                      border: '1px solid #000', 
+                      padding: '8px', 
+                      backgroundColor: '#f0f0f0', 
+                      fontWeight: 'bold',
+                      fontSize: '10px'
+                    }} colSpan="3">
+                      Enrollment Summary
+                    </td>
+                  </tr>
+                  <tr style={{ backgroundColor: '#f8f8f8' }}>
+                    <td style={{ 
+                      padding: '5px', 
+                      fontWeight: 'bold',
+                      fontSize: '9px',
+                      width: '35%'
+                    }}>
+                      Start/End Date
+                    </td>
+                    <td style={{ 
+                      padding: '5px', 
+                      fontWeight: 'bold',
+                      fontSize: '9px',
+                      width: '20%'
+                    }}>
+                      Grade
+                    </td>
+                    <td style={{ 
+                      padding: '5px', 
+                      fontWeight: 'bold',
+                      fontSize: '9px',
+                      width: '45%'
+                    }}>
+                      School
+                    </td>
+                  </tr>
+                  {transcriptData.enrollmentSummary.slice(0, 7).map((enrollment, index) => (
+                    <tr key={index}>
+                      <td style={{ 
+                        padding: '5px',
+                        fontSize: '9px'
+                      }}>
+                        {enrollment.startEndDate || (index === 0 ? '2016-2017' : index === 1 ? '2016-2017' : index === 2 ? '2017-2018' : index === 3 ? '2017-2018' : index === 4 ? '2017-2018' : index === 5 ? '2016-2017' : '2016-2017')}
+                      </td>
+                      <td style={{ 
+                        padding: '5px',
+                        fontSize: '9px'
+                      }}>
+                        {enrollment.grade || (index === 0 ? '9' : index === 1 ? '9' : index === 2 ? '10' : index === 3 ? '10' : index === 4 ? '10' : index === 5 ? '11' : '11')}
+                      </td>
+                      <td style={{ 
+                        padding: '5px',
+                        fontSize: '9px'
+                      }}>
+                        {enrollment.school || (index === 0 ? 'Leigh High School' : index === 1 ? 'Foothill College' : index === 2 ? 'Leigh High School' : index === 3 ? 'Foothill College' : index === 4 ? 'De Anza College' : index === 5 ? 'Legend College Preparatory' : 'Leigh High School')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* SEPARATOR LINE */}
+            <div style={{ width: '2px', backgroundColor: '#000' }}></div>
+
+            {/* Block 2: Total Credit Transfer (Right) */}
+            <div style={{ width: '30%' }}>
+              <table style={{ 
+                width: '100%', 
+                borderCollapse: 'collapse',
+                border: '2px solid #000'
+              }}>
+                <tbody>
+                  <tr>
+                    <td style={{ 
+                      border: '1px solid #000', 
+                      padding: '8px', 
+                      backgroundColor: '#f0f0f0', 
+                      fontWeight: 'bold',
+                      fontSize: '10px'
+                    }}>
+                      Total Credit Transferred
+                    </td>
+                  </tr>
+                  {uniqueSchools.map((school, index) => (
+                    <tr key={index}>
+                      <td style={{ 
+                        border: '1px solid #000',
+                        padding: '5px',
+                        fontSize: '9px'
+                      }}>
+                        {school.includes('Leigh High School') ? '150 Leigh High School' :
+                         school.includes('Foothill College') ? '30 Foothill College' :
+                         school.includes('De Anza College') ? '10 De Anza College' :
+                         `0 ${school}`}
+                      </td>
+                    </tr>
+                  ))}
+                  {/* Fill empty rows if needed */}
+                  {Array.from({ length: Math.max(0, 7 - uniqueSchools.length) }, (_, i) => (
+                    <tr key={`empty-${i}`}>
+                      <td style={{ 
+                        border: '1px solid #000',
+                        padding: '5px',
+                        fontSize: '9px'
+                      }}>
+                        &nbsp;
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT SIDE */}
+        <div style={{ width: '50%' }}>
+          {/* Total Credit Completed Block */}
+          <table style={{ 
+            width: '100%', 
+            borderCollapse: 'collapse', 
+            marginBottom: '10px',
+            border: '2px solid #000'
+          }}>
+            <tbody>
+              <tr>
+                <td style={{ 
+                  border: '1px solid #000', 
+                  padding: '8px', 
+                  backgroundColor: '#f0f0f0', 
+                  fontWeight: 'bold',
+                  fontSize: '10px'
+                }}>
+                  Total Credit Completed
+                </td>
+              </tr>
+              <tr>
+                <td style={{ 
+                  border: '1px solid #000', 
+                  padding: '8px',
+                  fontSize: '10px'
+                }}>
+                  {transcriptData.totalCredits || '20'} {transcriptData.institutionName || 'Legend College Preparatory'}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          {/* Additional space to align with left side */}
+          <div style={{ height: '200px' }}></div>
+        </div>
+      </div>
+
+      {/* Credit Summary Block - FULL WIDTH, NO INTERNAL GRID LINES, EDITABLE */}
       <table style={{ 
         width: '100%', 
         borderCollapse: 'collapse', 
@@ -424,7 +351,6 @@ const TranscriptPreview = () => {
         <tbody>
           <tr>
             <td style={{ 
-              border: '1px solid #000', 
               padding: '8px', 
               backgroundColor: '#f0f0f0', 
               fontWeight: 'bold',
@@ -437,7 +363,6 @@ const TranscriptPreview = () => {
           </tr>
           <tr>
             <td style={{ 
-              border: '1px solid #000', 
               padding: '8px',
               width: '50%',
               fontSize: '9px',
@@ -445,48 +370,47 @@ const TranscriptPreview = () => {
             }}>
               {/* Left Block - Only show actual courses */}
               {displayedCreditSummary.slice(0, Math.ceil(displayedCreditSummary.length / 2)).map((credit, index) => (
-                <div key={index} style={{ marginBottom: '5px' }}>
-                  <strong>{credit.subject}</strong> &nbsp;&nbsp; 
-                  Earned: {credit.earned || 0} &nbsp;&nbsp; 
-                  Required: {credit.required || 0}
+                <div key={index} style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
+                  <strong>{credit.subject}</strong>
+                  <span>Earned: {credit.earned || 0}</span>
+                  <span>Required: {credit.required || 0}</span>
                 </div>
               ))}
               {/* Fill with default subjects if less than expected */}
               {displayedCreditSummary.length < 8 && (
                 <>
                   {!displayedCreditSummary.find(c => c.subject === 'History/Social Science') && (
-                    <div style={{ marginBottom: '5px' }}>
-                      <strong>History/Social Science</strong> &nbsp;&nbsp; 
-                      Earned: 25 &nbsp;&nbsp; 
-                      Required: 30
+                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>History/Social Science</strong>
+                      <span>Earned: 25</span>
+                      <span>Required: 30</span>
                     </div>
                   )}
                   {!displayedCreditSummary.find(c => c.subject === 'English') && (
-                    <div style={{ marginBottom: '5px' }}>
-                      <strong>English</strong> &nbsp;&nbsp; 
-                      Earned: 25 &nbsp;&nbsp; 
-                      Required: 40
+                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>English</strong>
+                      <span>Earned: 25</span>
+                      <span>Required: 40</span>
                     </div>
                   )}
                   {!displayedCreditSummary.find(c => c.subject === 'Foreign Language') && (
-                    <div style={{ marginBottom: '5px' }}>
-                      <strong>Foreign Language</strong> &nbsp;&nbsp; 
-                      Earned: 10 &nbsp;&nbsp; 
-                      Required: 20
+                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>Foreign Language</strong>
+                      <span>Earned: 10</span>
+                      <span>Required: 20</span>
                     </div>
                   )}
                   {!displayedCreditSummary.find(c => c.subject === 'Physical Education') && (
-                    <div>
-                      <strong>Physical Education</strong> &nbsp;&nbsp; 
-                      Earned: 20 &nbsp;&nbsp; 
-                      Required: 10
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>Physical Education</strong>
+                      <span>Earned: 20</span>
+                      <span>Required: 10</span>
                     </div>
                   )}
                 </>
               )}
             </td>
             <td style={{ 
-              border: '1px solid #000', 
               padding: '8px',
               width: '50%',
               fontSize: '9px',
@@ -494,41 +418,41 @@ const TranscriptPreview = () => {
             }}>
               {/* Right Block - Only show actual courses */}
               {displayedCreditSummary.slice(Math.ceil(displayedCreditSummary.length / 2)).map((credit, index) => (
-                <div key={index} style={{ marginBottom: '5px' }}>
-                  <strong>{credit.subject}</strong> &nbsp;&nbsp; 
-                  Earned: {credit.earned || 0} &nbsp;&nbsp; 
-                  Required: {credit.required || 0}
+                <div key={index} style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
+                  <strong>{credit.subject}</strong>
+                  <span>Earned: {credit.earned || 0}</span>
+                  <span>Required: {credit.required || 0}</span>
                 </div>
               ))}
               {/* Fill with default subjects if less than expected */}
               {displayedCreditSummary.length < 8 && (
                 <>
                   {!displayedCreditSummary.find(c => c.subject === 'Mathematics') && (
-                    <div style={{ marginBottom: '5px' }}>
-                      <strong>Mathematics</strong> &nbsp;&nbsp; 
-                      Earned: 45 &nbsp;&nbsp; 
-                      Required: 40
+                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>Mathematics</strong>
+                      <span>Earned: 45</span>
+                      <span>Required: 40</span>
                     </div>
                   )}
                   {!displayedCreditSummary.find(c => c.subject === 'Laboratory Science') && (
-                    <div style={{ marginBottom: '5px' }}>
-                      <strong>Laboratory Science</strong> &nbsp;&nbsp; 
-                      Earned: 35 &nbsp;&nbsp; 
-                      Required: 30
+                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>Laboratory Science</strong>
+                      <span>Earned: 35</span>
+                      <span>Required: 30</span>
                     </div>
                   )}
                   {!displayedCreditSummary.find(c => c.subject === 'Arts') && (
-                    <div style={{ marginBottom: '5px' }}>
-                      <strong>Arts</strong> &nbsp;&nbsp; 
-                      Earned: 10 &nbsp;&nbsp; 
-                      Required: 20
+                    <div style={{ marginBottom: '5px', display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>Arts</strong>
+                      <span>Earned: 10</span>
+                      <span>Required: 20</span>
                     </div>
                   )}
                   {!displayedCreditSummary.find(c => c.subject === 'Elective') && (
-                    <div>
-                      <strong>Elective</strong> &nbsp;&nbsp; 
-                      Earned: 60 &nbsp;&nbsp; 
-                      Required: 70
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>Elective</strong>
+                      <span>Earned: 60</span>
+                      <span>Required: 70</span>
                     </div>
                   )}
                 </>
@@ -555,7 +479,7 @@ const TranscriptPreview = () => {
                   pageBreakInside: 'avoid'
                 }}>
                   <tbody>
-                    {/* School Header */}
+                    {/* School Header - CENTERED */}
                     <tr>
                       <td style={{ 
                         border: '1px solid #000',
