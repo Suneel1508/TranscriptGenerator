@@ -691,13 +691,17 @@ const renderSemesterCourseRows = (leftSemester, rightSemester, semesterGPAs) => 
         )
       }
 
-      // Add GPA rows for each grade level
+      // Add GPA rows for each grade level - ONLY IF GPA > 0
       const leftGpaKey = leftGroup ? `${leftGroup.gradeLevel}-${leftGroup.schoolYear}-${leftSemester.semester}` : null
       const rightGpaKey = rightGroup ? `${rightGroup.gradeLevel}-${rightGroup.schoolYear}-${rightSemester?.semester}` : null
       const leftGPA = leftGpaKey ? semesterGPAs[leftGpaKey] : null
       const rightGPA = rightGpaKey ? semesterGPAs[rightGpaKey] : null
 
-      if (leftGPA || rightGPA) {
+      // ✅ ONLY SHOW GPA ROW IF AT LEAST ONE SIDE HAS GPA > 0
+      const showLeftGPA = leftGPA && leftGPA.gpa > 0
+      const showRightGPA = rightGPA && rightGPA.gpa > 0
+
+      if (showLeftGPA || showRightGPA) {
         rows.push(
           <tr key={`gpa-${i}`} style={{ backgroundColor: '#f9f9f9' }}>
             <td style={{ 
@@ -706,7 +710,8 @@ const renderSemesterCourseRows = (leftSemester, rightSemester, semesterGPAs) => 
               fontWeight: 'bold', 
               fontSize: '8px'
             }} colSpan={rightSemester ? "6" : "12"}>
-              {leftGPA ? `Sem. GPA (Weighted): ${leftGPA.gpa.toFixed(2)}` : ''}
+              {/* ✅ ONLY SHOW GPA TEXT IF > 0, OTHERWISE SHOW NOTHING */}
+              {showLeftGPA ? `Sem. GPA (Weighted): ${leftGPA.gpa.toFixed(2)}` : ''}
             </td>
             {rightSemester && (
               <td style={{ 
@@ -715,7 +720,8 @@ const renderSemesterCourseRows = (leftSemester, rightSemester, semesterGPAs) => 
                 fontWeight: 'bold', 
                 fontSize: '8px'
               }} colSpan="6">
-                {rightGPA ? `Sem. GPA (Weighted): ${rightGPA.gpa.toFixed(2)}` : ''}
+                {/* ✅ ONLY SHOW GPA TEXT IF > 0, OTHERWISE SHOW NOTHING */}
+                {showRightGPA ? `Sem. GPA (Weighted): ${rightGPA.gpa.toFixed(2)}` : ''}
               </td>
             )}
           </tr>
