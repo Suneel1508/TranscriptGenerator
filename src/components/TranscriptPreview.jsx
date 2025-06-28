@@ -534,8 +534,7 @@ const TranscriptPreview = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  textAlign: 'center',
-      border: none !important
+                  textAlign: 'center'
                 }}>
                   {transcriptData.digitalStamp && (
                     <img
