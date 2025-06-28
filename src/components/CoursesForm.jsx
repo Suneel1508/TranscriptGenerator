@@ -69,17 +69,26 @@ const CoursesForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    // Validate course data - allow IP grades without credits requirement
-    const validation = validateCourse(courseForm)
+    // Check if it's an IP grade
+    const isIPGrade = courseForm.grade === 'IP'
+    
+    // For IP grades, create a version with empty credits for validation
+    const courseToValidate = isIPGrade ? { ...courseForm, credits: '0' } : courseForm
+    
+    // Validate course data
+    const validation = validateCourse(courseToValidate)
     if (!validation.isValid) {
       alert('Please fix the following errors:\n' + validation.errors.join('\n'))
       return
     }
 
+    // For IP grades, ensure credits is empty string in the final course
+    const finalCourse = isIPGrade ? { ...courseForm, credits: '' } : courseForm
+
     if (editingCourse) {
-      updateCourse(editingCourse.id, courseForm)
+      updateCourse(editingCourse.id, finalCourse)
     } else {
-      addCourse(courseForm)
+      addCourse(finalCourse)
     }
     resetForm()
   }
@@ -128,6 +137,9 @@ const CoursesForm = () => {
   const semesterGroups = groupCoursesBySemester()
   const semesterGPAs = calculateSemesterGPA(transcriptData.courses, true)
   const yearlyGPAs = calculateYearlyGPA(transcriptData.courses, true)
+
+  // Check if current grade is IP to make credits optional
+  const isIPGrade = courseForm.grade === 'IP'
 
   return (
     <div className="space-y-6">
@@ -263,7 +275,7 @@ const CoursesForm = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Credits *
+                  Credits {!isIPGrade && '*'}
                 </label>
                 <input
                   type="number"
@@ -272,12 +284,12 @@ const CoursesForm = () => {
                   value={courseForm.credits}
                   onChange={(e) => setCourseForm(prev => ({ ...prev, credits: e.target.value }))}
                   className="input-field"
-                  placeholder="e.g., 5"
-                  required
+                  placeholder={isIPGrade ? 'Optional for IP grades' : 'e.g., 5'}
+                  required={!isIPGrade}
                 />
-                {courseForm.grade === 'IP' && (
+                {isIPGrade && (
                   <p className="text-xs text-orange-600 mt-1">
-                    Note: IP courses won't count toward GPA or credit totals
+                    Credits are optional for In Progress (IP) courses
                   </p>
                 )}
               </div>
@@ -300,7 +312,7 @@ const CoursesForm = () => {
             </div>
 
             {/* Real-time calculation preview */}
-            {courseForm.grade && courseForm.credits && (
+            {courseForm.grade && (courseForm.credits || isIPGrade) && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <div className="text-sm text-blue-900">
                   <strong>Course Preview:</strong> {getCourseLevelName(courseForm.hap)} • 
