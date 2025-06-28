@@ -32,20 +32,20 @@ const StudentInfoForm = () => {
     }
   }
 
+  // DYNAMIC CREDIT SUMMARY FUNCTIONS
   const handleCreditSummaryChange = (index, field, value) => {
     const newCreditSummary = [...transcriptData.creditSummary]
     newCreditSummary[index] = { ...newCreditSummary[index], [field]: value }
     updateTranscriptData({ creditSummary: newCreditSummary })
   }
 
-  // Add more credit summary subjects if needed
-  const addCreditSummaryRow = () => {
+  const addCreditSummaryEntry = () => {
     const newCreditSummary = [...transcriptData.creditSummary, { subject: '', earned: 0, required: 0 }]
     updateTranscriptData({ creditSummary: newCreditSummary })
   }
 
-  const removeCreditSummaryRow = (index) => {
-    if (transcriptData.creditSummary.length > 8) { // Keep minimum 8 subjects
+  const removeCreditSummaryEntry = (index) => {
+    if (transcriptData.creditSummary.length > 1) {
       const newCreditSummary = transcriptData.creditSummary.filter((_, i) => i !== index)
       updateTranscriptData({ creditSummary: newCreditSummary })
     }
@@ -334,166 +334,81 @@ const StudentInfoForm = () => {
         </div>
       </div>
 
-      {/* Credit Summary - IMPROVED 2-BLOCK LAYOUT */}
+      {/* DYNAMIC Credit Summary - COMPLETELY REDESIGNED */}
       <div className="bg-gray-50 p-4 rounded-lg">
-        <h4 className="text-md font-medium text-gray-900 mb-4">Credit Summary (2-Block Layout)</h4>
-        <p className="text-sm text-gray-600 mb-4">
-          Organize subjects into two blocks of 5 rows each for optimal transcript formatting.
-        </p>
-        
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Block 1 - Left Side (Subjects 0-4) */}
-          <div>
-            <h5 className="text-sm font-semibold text-gray-800 mb-3">Block 1 (Left Side)</h5>
-            {transcriptData.creditSummary.slice(0, 5).map((credit, index) => (
-              <div key={index} className="grid grid-cols-4 gap-2 mb-2">
-                <div className="col-span-2">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
-                    Subject
-                  </label>
-                  <input
-                    type="text"
-                    value={credit.subject}
-                    onChange={(e) => handleCreditSummaryChange(index, 'subject', e.target.value)}
-                    className="input-field text-xs"
-                    placeholder="Subject Name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
-                    Earned
-                  </label>
-                  <input
-                    type="number"
-                    value={credit.earned}
-                    onChange={(e) => handleCreditSummaryChange(index, 'earned', parseInt(e.target.value))}
-                    className="input-field text-xs"
-                    placeholder="0"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
-                    Required
-                  </label>
-                  <input
-                    type="number"
-                    value={credit.required}
-                    onChange={(e) => handleCreditSummaryChange(index, 'required', parseInt(e.target.value))}
-                    className="input-field text-xs"
-                    placeholder="0"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Block 2 - Right Side (Subjects 5-9) */}
-          <div>
-            <h5 className="text-sm font-semibold text-gray-800 mb-3">Block 2 (Right Side)</h5>
-            {transcriptData.creditSummary.slice(5, 10).map((credit, index) => {
-              const actualIndex = index + 5
-              return (
-                <div key={actualIndex} className="grid grid-cols-4 gap-2 mb-2">
-                  <div className="col-span-2">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Subject
-                    </label>
-                    <input
-                      type="text"
-                      value={credit.subject}
-                      onChange={(e) => handleCreditSummaryChange(actualIndex, 'subject', e.target.value)}
-                      className="input-field text-xs"
-                      placeholder="Subject Name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Earned
-                    </label>
-                    <input
-                      type="number"
-                      value={credit.earned}
-                      onChange={(e) => handleCreditSummaryChange(actualIndex, 'earned', parseInt(e.target.value))}
-                      className="input-field text-xs"
-                      placeholder="0"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Required
-                    </label>
-                    <input
-                      type="number"
-                      value={credit.required}
-                      onChange={(e) => handleCreditSummaryChange(actualIndex, 'required', parseInt(e.target.value))}
-                      className="input-field text-xs"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Add/Remove Rows for Additional Subjects */}
-        {transcriptData.creditSummary.length > 10 && (
-          <div className="mt-4">
-            <h5 className="text-sm font-semibold text-gray-800 mb-3">Additional Subjects</h5>
-            {transcriptData.creditSummary.slice(10).map((credit, index) => {
-              const actualIndex = index + 10
-              return (
-                <div key={actualIndex} className="grid grid-cols-5 gap-2 mb-2">
-                  <div className="col-span-2">
-                    <input
-                      type="text"
-                      value={credit.subject}
-                      onChange={(e) => handleCreditSummaryChange(actualIndex, 'subject', e.target.value)}
-                      className="input-field text-xs"
-                      placeholder="Subject Name"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      value={credit.earned}
-                      onChange={(e) => handleCreditSummaryChange(actualIndex, 'earned', parseInt(e.target.value))}
-                      className="input-field text-xs"
-                      placeholder="Earned"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      value={credit.required}
-                      onChange={(e) => handleCreditSummaryChange(actualIndex, 'required', parseInt(e.target.value))}
-                      className="input-field text-xs"
-                      placeholder="Required"
-                    />
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => removeCreditSummaryRow(actualIndex)}
-                      className="text-red-600 hover:text-red-800 text-xs"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        <div className="mt-4">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-md font-medium text-gray-900">Credit Summary</h4>
           <button
             type="button"
-            onClick={addCreditSummaryRow}
-            className="btn-secondary text-sm"
+            onClick={addCreditSummaryEntry}
+            className="btn-primary flex items-center space-x-2 text-sm"
           >
-            Add Subject
+            <Plus className="h-4 w-4" />
+            <span>Add Subject</span>
           </button>
+        </div>
+        
+        <div className="space-y-4">
+          {transcriptData.creditSummary.map((credit, index) => (
+            <div key={index} className="grid md:grid-cols-4 gap-4 p-3 bg-white rounded border">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  value={credit.subject}
+                  onChange={(e) => handleCreditSummaryChange(index, 'subject', e.target.value)}
+                  className="input-field"
+                  placeholder="e.g., Mathematics, English, Science"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Earned Credits
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={credit.earned}
+                  onChange={(e) => handleCreditSummaryChange(index, 'earned', parseInt(e.target.value) || 0)}
+                  className="input-field"
+                  placeholder="0"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Required Credits
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={credit.required}
+                  onChange={(e) => handleCreditSummaryChange(index, 'required', parseInt(e.target.value) || 0)}
+                  className="input-field"
+                  placeholder="0"
+                />
+              </div>
+              <div className="md:col-span-4 flex justify-end">
+                {transcriptData.creditSummary.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeCreditSummaryEntry(index)}
+                    className="btn-secondary text-red-600 hover:text-red-800 hover:bg-red-50 flex items-center space-x-1 text-sm"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span>Remove Subject</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
+          <p className="text-sm text-blue-800">
+            <strong>Tip:</strong> Add all academic subjects with their earned and required credits. Common subjects include Mathematics, English, Science, History, Foreign Language, Arts, and Physical Education.
+          </p>
         </div>
       </div>
 
