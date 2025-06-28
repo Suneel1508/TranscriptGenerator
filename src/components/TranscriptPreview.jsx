@@ -179,7 +179,7 @@ const TranscriptPreview = () => {
         ))}
       </div>
 
-      {/* Credit Summary - Simple Grid Layout */}
+      {/* Credit Summary - IMPROVED 2-BLOCK LAYOUT */}
       <div style={{ 
         border: thickBorderStyle, 
         marginBottom: '15px',
@@ -189,32 +189,39 @@ const TranscriptPreview = () => {
           backgroundColor: '#e8e8e8',
           padding: '4px 8px',
           fontWeight: 'bold',
-          borderBottom: borderStyle
+          borderBottom: borderStyle,
+          textAlign: 'center'
         }}>
           Credit Summary<br />
           Curriculum Track: College Prep, Honors
         </div>
-        <div style={{ padding: '8px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '4px' }}>
-            <div><strong>History/Social Science</strong> Earned: {transcriptData.creditSummary[0]?.earned || 25} Required: {transcriptData.creditSummary[0]?.required || 30}</div>
-            <div><strong>English</strong> Earned: {transcriptData.creditSummary[1]?.earned || 25} Required: {transcriptData.creditSummary[1]?.required || 40}</div>
+        <div style={{ 
+          padding: '8px',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '20px'
+        }}>
+          {/* Block 1 - Left Side */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+            <div><strong>History/Social Science</strong> &nbsp;&nbsp; Earned: {transcriptData.creditSummary[0]?.earned || 25} &nbsp;&nbsp; Required: {transcriptData.creditSummary[0]?.required || 30}</div>
+            <div><strong>English</strong> &nbsp;&nbsp; Earned: {transcriptData.creditSummary[1]?.earned || 25} &nbsp;&nbsp; Required: {transcriptData.creditSummary[1]?.required || 40}</div>
+            <div><strong>Foreign Language</strong> &nbsp;&nbsp; Earned: {transcriptData.creditSummary[4]?.earned || 10} &nbsp;&nbsp; Required: {transcriptData.creditSummary[4]?.required || 20}</div>
+            <div><strong>Physical Education</strong> &nbsp;&nbsp; Earned: {transcriptData.creditSummary[7]?.earned || 20} &nbsp;&nbsp; Required: {transcriptData.creditSummary[7]?.required || 10}</div>
+            <div><strong>Elective</strong> &nbsp;&nbsp; Earned: {transcriptData.creditSummary[6]?.earned || 60} &nbsp;&nbsp; Required: {transcriptData.creditSummary[6]?.required || 70}</div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '4px' }}>
-            <div><strong>Mathematics</strong> Earned: {transcriptData.creditSummary[2]?.earned || 45} Required: {transcriptData.creditSummary[2]?.required || 40}</div>
-            <div><strong>Laboratory Science</strong> Earned: {transcriptData.creditSummary[3]?.earned || 35} Required: {transcriptData.creditSummary[3]?.required || 30}</div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '4px' }}>
-            <div><strong>Foreign Language</strong> Earned: {transcriptData.creditSummary[4]?.earned || 10} Required: {transcriptData.creditSummary[4]?.required || 20}</div>
-            <div><strong>Arts</strong> Earned: {transcriptData.creditSummary[5]?.earned || 10} Required: {transcriptData.creditSummary[5]?.required || 20}</div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div><strong>Elective</strong> Earned: {transcriptData.creditSummary[6]?.earned || 60} Required: {transcriptData.creditSummary[6]?.required || 70}</div>
-            <div><strong>Physical Education</strong> Earned: {transcriptData.creditSummary[7]?.earned || 20} Required: {transcriptData.creditSummary[7]?.required || 10}</div>
+          
+          {/* Block 2 - Right Side */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+            <div><strong>Mathematics</strong> &nbsp;&nbsp; Earned: {transcriptData.creditSummary[2]?.earned || 45} &nbsp;&nbsp; Required: {transcriptData.creditSummary[2]?.required || 40}</div>
+            <div><strong>Laboratory Science</strong> &nbsp;&nbsp; Earned: {transcriptData.creditSummary[3]?.earned || 35} &nbsp;&nbsp; Required: {transcriptData.creditSummary[3]?.required || 30}</div>
+            <div><strong>Arts</strong> &nbsp;&nbsp; Earned: {transcriptData.creditSummary[5]?.earned || 10} &nbsp;&nbsp; Required: {transcriptData.creditSummary[5]?.required || 20}</div>
+            <div style={{ color: '#666' }}>[Additional Subject]</div>
+            <div style={{ color: '#666' }}>[Additional Subject]</div>
           </div>
         </div>
       </div>
 
-      {/* Course Records - SIMPLIFIED SCHOOL-BASED LAYOUT */}
+      {/* Course Records - INTEGRATED SCHOOL HEADERS */}
       {Object.keys(schoolGroups).length > 0 && (
         <div style={{ marginBottom: '20px' }}>
           {Object.entries(schoolGroups)
@@ -223,36 +230,36 @@ const TranscriptPreview = () => {
               const semesters = Object.values(semesterGroups).sort((a, b) => a.semester.localeCompare(b.semester))
               
               return (
-                <div key={school} style={{ marginBottom: '20px', pageBreakInside: 'avoid' }}>
-                  {/* School Header */}
-                  <div style={{ 
-                    backgroundColor: '#f0f0f0', 
-                    border: thickBorderStyle, 
-                    padding: '4px 8px', 
-                    fontWeight: 'bold', 
-                    fontSize: '10px',
-                    marginBottom: '2px'
-                  }}>
-                    #{school}
-                  </div>
-
-                  {/* Semesters Side by Side - SIMPLIFIED */}
+                <div key={school} style={{ marginBottom: '15px', pageBreakInside: 'avoid' }}>
+                  {/* INTEGRATED SCHOOL HEADER - NO GAPS */}
                   <div style={{ 
                     border: thickBorderStyle,
                     fontSize: '9px'
                   }}>
-                    {/* Create pairs of semesters for side-by-side display */}
+                    {/* School Name Header - CENTERED AND INTEGRATED */}
+                    <div style={{ 
+                      backgroundColor: '#f0f0f0', 
+                      padding: '6px 8px', 
+                      fontWeight: 'bold', 
+                      fontSize: '10px',
+                      textAlign: 'center',
+                      borderBottom: borderStyle
+                    }}>
+                      #{school}
+                    </div>
+
+                    {/* Semesters Side by Side - SEAMLESS INTEGRATION */}
                     {Array.from({ length: Math.ceil(semesters.length / 2) }, (_, rowIndex) => {
                       const leftSemester = semesters[rowIndex * 2]
                       const rightSemester = semesters[rowIndex * 2 + 1]
                       
                       return (
                         <div key={rowIndex}>
-                          {/* Semester Headers */}
+                          {/* Semester Headers - CONNECTED TO SCHOOL */}
                           <div style={{ 
                             display: 'grid', 
                             gridTemplateColumns: rightSemester ? '1fr 1fr' : '1fr',
-                            backgroundColor: '#f0f0f0',
+                            backgroundColor: '#f8f8f8',
                             fontWeight: 'bold',
                             borderBottom: borderStyle
                           }}>
@@ -269,7 +276,7 @@ const TranscriptPreview = () => {
                             )}
                           </div>
 
-                          {/* Column Headers */}
+                          {/* Column Headers - SEAMLESS */}
                           <div style={{ 
                             display: 'grid', 
                             gridTemplateColumns: rightSemester ? '1fr 1fr' : '1fr',
@@ -291,7 +298,7 @@ const TranscriptPreview = () => {
                             )}
                           </div>
 
-                          {/* Course Rows */}
+                          {/* Course Rows - UNIFIED TABLE */}
                           {renderSemesterCourseRows(leftSemester, rightSemester, semesterGPAs, borderStyle)}
                         </div>
                       )
