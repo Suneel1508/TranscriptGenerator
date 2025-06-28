@@ -5,8 +5,8 @@ import FilesUpload from '../components/FilesUpload'
 import TranscriptPreview from '../components/TranscriptPreview'
 import GPASummary from '../components/GPASummary'
 import { useTranscript } from '../context/TranscriptContext'
-import { Save, Download, Eye, EyeOff, Plus, Calculator } from 'lucide-react'
-import { generatePDF } from '../utils/pdfGenerator'
+import { Save, Download, Eye, EyeOff, Plus, Calculator, TestTube, Printer } from 'lucide-react'
+import { generatePDF, generatePDFViaPrint, testPDFQuality } from '../utils/pdfGenerator'
 import { useNavigate } from 'react-router-dom'
 
 const TranscriptForm = () => {
@@ -41,11 +41,39 @@ const TranscriptForm = () => {
     setIsGenerating(true)
     try {
       await generatePDF(transcriptData)
+      alert('PDF generated successfully! Check your downloads folder.')
     } catch (error) {
       console.error('Error generating PDF:', error)
-      alert('Error generating PDF. Please try again.')
+      alert(`Error generating PDF: ${error.message}\n\nPlease try the alternative print method or contact support.`)
     } finally {
       setIsGenerating(false)
+    }
+  }
+
+  const handleGeneratePDFViaPrint = async () => {
+    setIsGenerating(true)
+    try {
+      await generatePDFViaPrint(transcriptData)
+      alert('Print dialog opened! Use your browser\'s print function to save as PDF for best quality.')
+    } catch (error) {
+      console.error('Error generating PDF via print:', error)
+      alert(`Error opening print dialog: ${error.message}`)
+    } finally {
+      setIsGenerating(false)
+    }
+  }
+
+  const handleTestPDFQuality = async () => {
+    try {
+      const success = await testPDFQuality()
+      if (success) {
+        alert('PDF quality test completed! Check the downloaded test file to verify rendering quality.')
+      } else {
+        alert('PDF quality test failed. Please check the console for errors.')
+      }
+    } catch (error) {
+      console.error('PDF quality test error:', error)
+      alert('PDF quality test encountered an error.')
     }
   }
 
@@ -81,7 +109,7 @@ const TranscriptForm = () => {
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Enhanced Action Buttons with PDF Quality Options */}
       <div className="flex flex-wrap gap-4 mb-6">
         <button
           onClick={() => setShowPreview(!showPreview)}
@@ -98,20 +126,53 @@ const TranscriptForm = () => {
           <Save className="h-4 w-4" />
           <span>{isLoading ? 'Saving...' : currentTranscriptId ? 'Update' : 'Save'} Progress</span>
         </button>
+        
+        {/* Primary PDF Generation Method */}
         <button
           onClick={handleGeneratePDF}
           disabled={isGenerating}
           className="btn-primary flex items-center space-x-2 disabled:opacity-50"
         >
           <Download className="h-4 w-4" />
-          <span>{isGenerating ? 'Generating...' : 'Generate PDF'}</span>
+          <span>{isGenerating ? 'Generating...' : 'Generate High-Quality PDF'}</span>
         </button>
+        
+        {/* Alternative Print Method */}
+        <button
+          onClick={handleGeneratePDFViaPrint}
+          disabled={isGenerating}
+          className="btn-secondary flex items-center space-x-2 disabled:opacity-50"
+        >
+          <Printer className="h-4 w-4" />
+          <span>Print to PDF (Alternative)</span>
+        </button>
+        
+        {/* PDF Quality Test */}
+        <button
+          onClick={handleTestPDFQuality}
+          className="btn-secondary flex items-center space-x-2"
+        >
+          <TestTube className="h-4 w-4" />
+          <span>Test PDF Quality</span>
+        </button>
+        
         <button
           onClick={() => navigate('/past-transcripts')}
           className="btn-secondary flex items-center space-x-2"
         >
           <span>View Past Transcripts</span>
         </button>
+      </div>
+
+      {/* PDF Generation Help */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <h4 className="text-sm font-medium text-blue-900 mb-2">PDF Generation Options</h4>
+        <div className="text-sm text-blue-800 space-y-1">
+          <p>• <strong>High-Quality PDF:</strong> Advanced rendering with crisp text and clean borders (recommended)</p>
+          <p>• <strong>Print to PDF:</strong> Uses browser's native print function for maximum compatibility</p>
+          <p>• <strong>Test PDF Quality:</strong> Generate a test document to verify rendering quality</p>
+          <p>• If you experience issues, try the alternative print method or contact support</p>
+        </div>
       </div>
 
       {/* Error Message */}
@@ -155,7 +216,7 @@ const TranscriptForm = () => {
           <div className="lg:sticky lg:top-8 lg:h-fit">
             <div className="card p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Live Preview</h2>
-              <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
                 <TranscriptPreview />
               </div>
             </div>
