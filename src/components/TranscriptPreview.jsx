@@ -477,114 +477,124 @@ const TranscriptPreview = () => {
         </div>
       )}
 
-      {/* Comments Section - SEPARATE BOX WITH BORDER AND HEADER */}
+      {/* Comments and Signature Section - SIDE BY SIDE AS SHOWN IN IMAGE */}
       <div style={{ 
-        border: '2px solid #000',
-        marginBottom: '20px'
+        display: 'flex',
+        gap: '20px',
+        marginTop: '30px'
       }}>
-        {/* Comments Header */}
+        {/* LEFT SIDE: Comments Box with Border and Header */}
         <div style={{ 
-          backgroundColor: '#f0f0f0',
-          padding: '8px',
-          fontWeight: 'bold',
-          fontSize: '10px',
-          borderBottom: '1px solid #000'
+          width: '60%',
+          border: '2px solid #000'
         }}>
-          Comments
-        </div>
-        
-        {/* Comments Content */}
-        <div style={{ 
-          padding: '10px',
-          fontSize: '9px',
-          display: 'flex',
-          minHeight: '120px'
-        }}>
-          {/* LEFT SIDE: Grade Legend Text */}
+          {/* Comments Header */}
           <div style={{ 
-            width: '60%', 
-            paddingRight: '10px',
-            lineHeight: '1.4'
+            backgroundColor: '#f0f0f0',
+            padding: '8px',
+            fontWeight: 'bold',
+            fontSize: '10px',
+            borderBottom: '1px solid #000'
           }}>
-            <div style={{ marginBottom: '8px' }}>
-              <strong>UNOFFICIAL TRANSCRIPT</strong>
-            </div>
-            <div style={{ marginBottom: '4px' }}>
-              CL-College Level
-            </div>
-            <div style={{ marginBottom: '4px' }}>
-              IP- In Progress
-            </div>
-            <div style={{ marginBottom: '4px' }}>
-              P- Pass
-            </div>
-            <div style={{ marginBottom: '4px' }}>
-              F- Fail
-            </div>
-            
-            {/* Additional comments if provided */}
-            {transcriptData.comments && transcriptData.comments.trim() !== '' && (
-              <div style={{ marginTop: '10px', fontSize: '8px' }}>
-                {transcriptData.comments}
-              </div>
-            )}
+            Comments
           </div>
           
-          {/* RIGHT SIDE: Digital Stamp - CENTER ALIGNED */}
+          {/* Comments Content */}
           <div style={{ 
-            width: '40%', 
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center'
+            padding: '10px',
+            fontSize: '9px',
+            minHeight: '120px',
+            display: 'flex'
           }}>
-            {transcriptData.digitalStamp && (
+            {/* LEFT SIDE: Grade Legend Text */}
+            <div style={{ 
+              width: '60%', 
+              paddingRight: '10px',
+              lineHeight: '1.4'
+            }}>
+              <div style={{ marginBottom: '8px' }}>
+                <strong>UNOFFICIAL TRANSCRIPT</strong>
+              </div>
+              <div style={{ marginBottom: '4px' }}>
+                CL-College Level
+              </div>
+              <div style={{ marginBottom: '4px' }}>
+                IP- In Progress
+              </div>
+              <div style={{ marginBottom: '4px' }}>
+                P- Pass
+              </div>
+              <div style={{ marginBottom: '4px' }}>
+                F- Fail
+              </div>
+              
+              {/* Additional comments if provided */}
+              {transcriptData.comments && transcriptData.comments.trim() !== '' && (
+                <div style={{ marginTop: '10px', fontSize: '8px' }}>
+                  {transcriptData.comments}
+                </div>
+              )}
+            </div>
+            
+            {/* RIGHT SIDE: Digital Stamp - CENTER ALIGNED */}
+            <div style={{ 
+              width: '40%', 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center'
+            }}>
+              {transcriptData.digitalStamp && (
+                <img
+                  src={transcriptData.digitalStamp.preview}
+                  alt="Official Stamp"
+                  style={{ 
+                    height: '80px', 
+                    maxWidth: '120px', 
+                    objectFit: 'contain'
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT SIDE: Principal Signature Section - NO BORDER, SEPARATE */}
+        <div style={{ 
+          width: '40%',
+          textAlign: 'center',
+          fontSize: '9px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}>
+          {/* Principal Signature */}
+          {transcriptData.signature && (
+            <div style={{ marginBottom: '15px' }}>
               <img
-                src={transcriptData.digitalStamp.preview}
-                alt="Official Stamp"
+                src={transcriptData.signature.preview}
+                alt="Principal Signature"
                 style={{ 
-                  height: '80px', 
-                  maxWidth: '120px', 
+                  height: '60px', 
+                  maxWidth: '200px', 
+                  margin: '0 auto', 
                   objectFit: 'contain'
                 }}
               />
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Principal Signature Section - SEPARATE, NO BORDER */}
-      <div style={{ 
-        textAlign: 'center',
-        fontSize: '9px',
-        marginTop: '30px'
-      }}>
-        {/* Principal Signature */}
-        {transcriptData.signature && (
-          <div style={{ marginBottom: '15px' }}>
-            <img
-              src={transcriptData.signature.preview}
-              alt="Principal Signature"
-              style={{ 
-                height: '60px', 
-                maxWidth: '200px', 
-                margin: '0 auto', 
-                objectFit: 'contain'
-              }}
-            />
-          </div>
-        )}
-        <div style={{ 
-          borderTop: '1px solid #000', 
-          paddingTop: '8px',
-          display: 'inline-block',
-          minWidth: '300px'
-        }}>
-          <div style={{ marginBottom: '5px' }}>
-            Principal Signature: {transcriptData.principalName || 'Principal Name'}
-          </div>
-          <div>
-            Date: {formatDate(transcriptData.dateSigned) || 'January 31, 2019'}
+            </div>
+          )}
+          <div style={{ 
+            borderTop: '1px solid #000', 
+            paddingTop: '8px',
+            minWidth: '250px'
+          }}>
+            <div style={{ marginBottom: '5px' }}>
+              Principal Signature: {transcriptData.principalName || 'Principal Name'}
+            </div>
+            <div>
+              Date: {formatDate(transcriptData.dateSigned) || 'January 31, 2019'}
+            </div>
           </div>
         </div>
       </div>
