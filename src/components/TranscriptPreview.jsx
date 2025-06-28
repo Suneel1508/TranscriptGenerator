@@ -36,6 +36,81 @@ const TranscriptPreview = () => {
   const semesterGroups = groupCoursesBySemester()
   const semesterGPAs = calculateSemesterGPA(transcriptData.courses, true)
 
+  // Function to render a single semester table
+  const renderSemesterTable = (semesterGroup, semesterIndex) => {
+    // Group courses by grade level within semester
+    const gradeGroups = {}
+    semesterGroup.courses.forEach(course => {
+      const gradeKey = `${course.gradeLevel}-${course.schoolYear}`
+      if (!gradeGroups[gradeKey]) {
+        gradeGroups[gradeKey] = {
+          gradeLevel: course.gradeLevel,
+          schoolYear: course.schoolYear,
+          courses: []
+        }
+      }
+      gradeGroups[gradeKey].courses.push(course)
+    })
+
+    return (
+      <div key={semesterIndex} style={{ marginBottom: '15px', width: '100%' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px', border: '2px solid black' }}>
+          <tbody>
+            {/* Semester Header */}
+            <tr>
+              <td style={{ padding: '4px 8px', fontWeight: 'bold', backgroundColor: '#f0f0f0', borderBottom: '1px solid black' }} colSpan="6">
+                {semesterGroup.semester} Semester:
+              </td>
+            </tr>
+            
+            {/* Column Headers */}
+            <tr style={{ backgroundColor: '#f5f5f5' }}>
+              <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '12%' }}>Grade Level</td>
+              <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '15%' }}>School Year</td>
+              <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '35%' }}>Course Title</td>
+              <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '10%' }}>H/AP</td>
+              <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '10%' }}>Grade</td>
+              <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '18%' }}>Credits</td>
+            </tr>
+
+            {/* Course Rows by Grade Level */}
+            {Object.values(gradeGroups)
+              .sort((a, b) => a.gradeLevel - b.gradeLevel)
+              .map((gradeGroup, gradeIndex) => {
+                const gradeKey = `${gradeGroup.gradeLevel}-${gradeGroup.schoolYear}-${semesterGroup.semester}`
+                const gradeGPA = semesterGPAs[gradeKey]
+                
+                return (
+                  <React.Fragment key={gradeIndex}>
+                    {gradeGroup.courses.map((course, courseIndex) => (
+                      <tr key={courseIndex}>
+                        <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.gradeLevel}</td>
+                        <td style={{ padding: '2px 4px', border: '1px solid black' }}>'{course.schoolYear}</td>
+                        <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.courseTitle}</td>
+                        <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.hap || ''}</td>
+                        <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.grade}</td>
+                        <td style={{ padding: '2px 4px', border: '1px solid black' }}>
+                          {isGradeCountedForGPA(course.grade) ? course.credits : ''}
+                        </td>
+                      </tr>
+                    ))}
+                    {/* Semester GPA Row for this grade level */}
+                    {gradeGPA && (
+                      <tr style={{ backgroundColor: '#f9f9f9' }}>
+                        <td colSpan="6" style={{ padding: '3px 4px', fontWeight: 'bold', fontSize: '8px', border: '1px solid black' }}>
+                          Sem. GPA (Weighted): {gradeGPA.gpa.toFixed(2)}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                )
+              })}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
   return (
     <div className="transcript-preview bg-white p-6 min-h-[800px]" id="transcript-preview" style={{ fontFamily: 'Arial, sans-serif', fontSize: '11px', lineHeight: '1.2', color: 'black' }}>
       {/* Header */}
@@ -188,79 +263,27 @@ const TranscriptPreview = () => {
         </div>
       </div>
 
-      {/* Course Records - NEW TABLE STRUCTURE */}
+      {/* Course Records - TWO COLUMN LAYOUT FOR SEMESTERS */}
       {semesterGroups.length > 0 && (
         <div style={{ marginBottom: '20px' }}>
-          {semesterGroups.map((semesterGroup, semesterIndex) => {
-            // Group courses by grade level within semester
-            const gradeGroups = {}
-            semesterGroup.courses.forEach(course => {
-              const gradeKey = `${course.gradeLevel}-${course.schoolYear}`
-              if (!gradeGroups[gradeKey]) {
-                gradeGroups[gradeKey] = {
-                  gradeLevel: course.gradeLevel,
-                  schoolYear: course.schoolYear,
-                  courses: []
-                }
-              }
-              gradeGroups[gradeKey].courses.push(course)
-            })
-
+          {/* Create pairs of semesters for two-column layout */}
+          {Array.from({ length: Math.ceil(semesterGroups.length / 2) }, (_, rowIndex) => {
+            const leftSemester = semesterGroups[rowIndex * 2]
+            const rightSemester = semesterGroups[rowIndex * 2 + 1]
+            
             return (
-              <div key={semesterIndex} style={{ marginBottom: '15px' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9px', border: '2px solid black' }}>
-                  <tbody>
-                    {/* Semester Header */}
-                    <tr>
-                      <td style={{ padding: '4px 8px', fontWeight: 'bold', backgroundColor: '#f0f0f0', borderBottom: '1px solid black' }} colSpan="6">
-                        {semesterGroup.semester} Semester:
-                      </td>
-                    </tr>
-                    
-                    {/* Column Headers */}
-                    <tr style={{ backgroundColor: '#f5f5f5' }}>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '12%' }}>Grade Level</td>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '15%' }}>School Year</td>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '35%' }}>Course Title</td>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '10%' }}>H/AP</td>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '10%' }}>Grade</td>
-                      <td style={{ padding: '2px 4px', fontWeight: 'bold', border: '1px solid black', width: '18%' }}>Credits</td>
-                    </tr>
-
-                    {/* Course Rows by Grade Level */}
-                    {Object.values(gradeGroups)
-                      .sort((a, b) => a.gradeLevel - b.gradeLevel)
-                      .map((gradeGroup, gradeIndex) => {
-                        const gradeKey = `${gradeGroup.gradeLevel}-${gradeGroup.schoolYear}-${semesterGroup.semester}`
-                        const gradeGPA = semesterGPAs[gradeKey]
-                        
-                        return (
-                          <React.Fragment key={gradeIndex}>
-                            {gradeGroup.courses.map((course, courseIndex) => (
-                              <tr key={courseIndex}>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.gradeLevel}</td>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>'{course.schoolYear}</td>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.courseTitle}</td>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.hap || ''}</td>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>{course.grade}</td>
-                                <td style={{ padding: '2px 4px', border: '1px solid black' }}>
-                                  {isGradeCountedForGPA(course.grade) ? course.credits : ''}
-                                </td>
-                              </tr>
-                            ))}
-                            {/* Semester GPA Row for this grade level */}
-                            {gradeGPA && (
-                              <tr style={{ backgroundColor: '#f9f9f9' }}>
-                                <td colSpan="6" style={{ padding: '3px 4px', fontWeight: 'bold', fontSize: '8px', border: '1px solid black' }}>
-                                  Sem. GPA (Weighted): {gradeGPA.gpa.toFixed(2)}
-                                </td>
-                              </tr>
-                            )}
-                          </React.Fragment>
-                        )
-                      })}
-                  </tbody>
-                </table>
+              <div key={rowIndex} style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                {/* Left Column */}
+                <div style={{ width: rightSemester ? '50%' : '100%' }}>
+                  {renderSemesterTable(leftSemester, rowIndex * 2)}
+                </div>
+                
+                {/* Right Column (if exists) */}
+                {rightSemester && (
+                  <div style={{ width: '50%' }}>
+                    {renderSemesterTable(rightSemester, rowIndex * 2 + 1)}
+                  </div>
+                )}
               </div>
             )
           })}
