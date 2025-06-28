@@ -477,7 +477,7 @@ const TranscriptPreview = () => {
         </div>
       )}
 
-      {/* Comments and Signature Section */}
+      {/* Comments and Signature Section - UPDATED LAYOUT */}
       <table style={{ 
         width: '100%', 
         borderCollapse: 'collapse',
@@ -495,20 +495,60 @@ const TranscriptPreview = () => {
               <div style={{ fontWeight: 'bold', marginBottom: '10px', fontSize: '10px' }}>
                 Comments
               </div>
-              <div style={{ minHeight: '80px', lineHeight: '1.4' }}>
-                {transcriptData.comments || 'UNOFFICIAL TRANSCRIPT\nCL-College Level IP- In Progress P- Pass F- Fail'}
-              </div>
               
-              {/* Digital Stamp */}
-              {transcriptData.digitalStamp && (
-                <div style={{ marginTop: '15px', textAlign: 'center' }}>
-                  <img
-                    src={transcriptData.digitalStamp.preview}
-                    alt="Official Stamp"
-                    style={{ height: '80px', maxWidth: '120px', objectFit: 'contain' }}
-                  />
+              {/* SPLIT LAYOUT: Grade Legend on Left, Digital Stamp on Right */}
+              <div style={{ display: 'flex', minHeight: '120px' }}>
+                {/* LEFT SIDE: Grade Legend Text */}
+                <div style={{ 
+                  width: '60%', 
+                  paddingRight: '10px',
+                  lineHeight: '1.4'
+                }}>
+                  <div style={{ marginBottom: '8px' }}>
+                    <strong>UNOFFICIAL TRANSCRIPT</strong>
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    CL-College Level
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    IP- In Progress
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    P- Pass
+                  </div>
+                  <div style={{ marginBottom: '4px' }}>
+                    F- Fail
+                  </div>
+                  
+                  {/* Additional comments if provided */}
+                  {transcriptData.comments && transcriptData.comments.trim() !== '' && (
+                    <div style={{ marginTop: '10px', fontSize: '8px' }}>
+                      {transcriptData.comments}
+                    </div>
+                  )}
                 </div>
-              )}
+                
+                {/* RIGHT SIDE: Digital Stamp - CENTER ALIGNED */}
+                <div style={{ 
+                  width: '40%', 
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center'
+                }}>
+                  {transcriptData.digitalStamp && (
+                    <img
+                      src={transcriptData.digitalStamp.preview}
+                      alt="Official Stamp"
+                      style={{ 
+                        height: '80px', 
+                        maxWidth: '120px', 
+                        objectFit: 'contain'
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
             </td>
             
             <td style={{ 
