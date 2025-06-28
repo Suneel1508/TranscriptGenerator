@@ -43,6 +43,42 @@ const TranscriptPreview = () => {
   const schoolGroups = groupCoursesBySchoolAndSemester()
   const semesterGPAs = calculateSemesterGPA(transcriptData.courses, true)
 
+  // Calculate total credits transferred by school
+  const calculateCreditsBySchool = () => {
+    const creditsBySchool = {}
+    
+    // Sum credits from enrollment summary by school
+    transcriptData.enrollmentSummary.forEach(enrollment => {
+      if (enrollment.school) {
+        const school = enrollment.school
+        if (!creditsBySchool[school]) {
+          creditsBySchool[school] = 0
+        }
+        // Extract credit numbers from existing data
+        if (school.includes('Leigh High School')) {
+          creditsBySchool[school] += 150
+        } else if (school.includes('Foothill College')) {
+          creditsBySchool[school] += 30
+        } else if (school.includes('De Anza College')) {
+          creditsBySchool[school] += 10
+        }
+      }
+    })
+    
+    return creditsBySchool
+  }
+
+  const creditsBySchool = calculateCreditsBySchool()
+
+  // Filter out empty credit summary entries for PDF display
+  const getDisplayedCreditSummary = () => {
+    return transcriptData.creditSummary.filter(credit => 
+      credit.subject && credit.subject.trim() !== ''
+    )
+  }
+
+  const displayedCreditSummary = getDisplayedCreditSummary()
+
   return (
     <div 
       className="transcript-preview" 
@@ -266,7 +302,7 @@ const TranscriptPreview = () => {
         </tbody>
       </table>
 
-      {/* Enrollment Summary */}
+      {/* Enrollment Summary - FIXED: No internal lines, only separator before Total Credit Transferred */}
       <table style={{ 
         width: '100%', 
         borderCollapse: 'collapse', 
@@ -288,25 +324,33 @@ const TranscriptPreview = () => {
           <tr style={{ backgroundColor: '#f8f8f8' }}>
             <td style={{ 
               border: '1px solid #000', 
+              borderRight: 'none', // Remove internal vertical lines
               padding: '5px', 
               fontWeight: 'bold',
-              fontSize: '9px'
+              fontSize: '9px',
+              width: '25%'
             }}>
               Start/End Date
             </td>
             <td style={{ 
               border: '1px solid #000', 
+              borderLeft: 'none',
+              borderRight: 'none', // Remove internal vertical lines
               padding: '5px', 
               fontWeight: 'bold',
-              fontSize: '9px'
+              fontSize: '9px',
+              width: '15%'
             }}>
               Grade
             </td>
             <td style={{ 
               border: '1px solid #000', 
+              borderLeft: 'none',
+              borderRight: '1px solid #000', // Keep separator before Total Credit Transferred
               padding: '5px', 
               fontWeight: 'bold',
-              fontSize: '9px'
+              fontSize: '9px',
+              width: '35%'
             }}>
               School
             </td>
@@ -314,47 +358,63 @@ const TranscriptPreview = () => {
               border: '1px solid #000', 
               padding: '5px', 
               fontWeight: 'bold',
-              fontSize: '9px'
+              fontSize: '9px',
+              width: '25%'
             }}>
               Total Credit Transferred
             </td>
           </tr>
-          {transcriptData.enrollmentSummary.slice(0, 7).map((enrollment, index) => (
-            <tr key={index}>
-              <td style={{ 
-                border: '1px solid #000', 
-                padding: '5px',
-                fontSize: '9px'
-              }}>
-                {enrollment.startEndDate || (index === 0 ? '2016-2017' : index === 1 ? '2016-2017' : index === 2 ? '2017-2018' : index === 3 ? '2017-2018' : index === 4 ? '2017-2018' : index === 5 ? '2016-2017' : '2016-2017')}
-              </td>
-              <td style={{ 
-                border: '1px solid #000', 
-                padding: '5px',
-                fontSize: '9px'
-              }}>
-                {enrollment.grade || (index === 0 ? '9' : index === 1 ? '9' : index === 2 ? '10' : index === 3 ? '10' : index === 4 ? '10' : index === 5 ? '11' : '11')}
-              </td>
-              <td style={{ 
-                border: '1px solid #000', 
-                padding: '5px',
-                fontSize: '9px'
-              }}>
-                {enrollment.school || (index === 0 ? 'Leigh High School' : index === 1 ? 'Foothill College' : index === 2 ? 'Leigh High School' : index === 3 ? 'Foothill College' : index === 4 ? 'De Anza College' : index === 5 ? 'Legend College Preparatory' : 'Leigh High School')}
-              </td>
-              <td style={{ 
-                border: '1px solid #000', 
-                padding: '5px',
-                fontSize: '9px'
-              }}>
-                {index === 0 ? '150 Leigh High School' : index === 1 ? '30 Foothill College' : index === 2 ? '10 De Anza College' : ''}
-              </td>
-            </tr>
-          ))}
+          {transcriptData.enrollmentSummary.slice(0, 7).map((enrollment, index) => {
+            // Calculate credit transfer display
+            let creditTransfer = ''
+            const school = enrollment.school || (index === 0 ? 'Leigh High School' : index === 1 ? 'Foothill College' : index === 2 ? 'Leigh High School' : index === 3 ? 'Foothill College' : index === 4 ? 'De Anza College' : index === 5 ? 'Legend College Preparatory' : 'Leigh High School')
+            
+            if (index === 0) creditTransfer = '150 Leigh High School'
+            else if (index === 1) creditTransfer = '30 Foothill College'
+            else if (index === 2) creditTransfer = '10 De Anza College'
+            
+            return (
+              <tr key={index}>
+                <td style={{ 
+                  border: '1px solid #000', 
+                  borderRight: 'none', // Remove internal vertical lines
+                  padding: '5px',
+                  fontSize: '9px'
+                }}>
+                  {enrollment.startEndDate || (index === 0 ? '2016-2017' : index === 1 ? '2016-2017' : index === 2 ? '2017-2018' : index === 3 ? '2017-2018' : index === 4 ? '2017-2018' : index === 5 ? '2016-2017' : '2016-2017')}
+                </td>
+                <td style={{ 
+                  border: '1px solid #000', 
+                  borderLeft: 'none',
+                  borderRight: 'none', // Remove internal vertical lines
+                  padding: '5px',
+                  fontSize: '9px'
+                }}>
+                  {enrollment.grade || (index === 0 ? '9' : index === 1 ? '9' : index === 2 ? '10' : index === 3 ? '10' : index === 4 ? '10' : index === 5 ? '11' : '11')}
+                </td>
+                <td style={{ 
+                  border: '1px solid #000', 
+                  borderLeft: 'none',
+                  borderRight: '1px solid #000', // Keep separator before Total Credit Transferred
+                  padding: '5px',
+                  fontSize: '9px'
+                }}>
+                  {school}
+                </td>
+                <td style={{ 
+                  border: '1px solid #000', 
+                  padding: '5px',
+                  fontSize: '9px'
+                }}>
+                  {creditTransfer}
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
 
-      {/* Credit Summary */}
+      {/* Credit Summary - FIXED: Only show actual courses, no empty placeholders */}
       <table style={{ 
         width: '100%', 
         borderCollapse: 'collapse', 
@@ -383,31 +443,47 @@ const TranscriptPreview = () => {
               fontSize: '9px',
               verticalAlign: 'top'
             }}>
-              <div style={{ marginBottom: '5px' }}>
-                <strong>History/Social Science</strong> &nbsp;&nbsp; 
-                Earned: {transcriptData.creditSummary[0]?.earned || 25} &nbsp;&nbsp; 
-                Required: {transcriptData.creditSummary[0]?.required || 30}
-              </div>
-              <div style={{ marginBottom: '5px' }}>
-                <strong>English</strong> &nbsp;&nbsp; 
-                Earned: {transcriptData.creditSummary[1]?.earned || 25} &nbsp;&nbsp; 
-                Required: {transcriptData.creditSummary[1]?.required || 40}
-              </div>
-              <div style={{ marginBottom: '5px' }}>
-                <strong>Foreign Language</strong> &nbsp;&nbsp; 
-                Earned: {transcriptData.creditSummary[4]?.earned || 10} &nbsp;&nbsp; 
-                Required: {transcriptData.creditSummary[4]?.required || 20}
-              </div>
-              <div style={{ marginBottom: '5px' }}>
-                <strong>Physical Education</strong> &nbsp;&nbsp; 
-                Earned: {transcriptData.creditSummary[7]?.earned || 20} &nbsp;&nbsp; 
-                Required: {transcriptData.creditSummary[7]?.required || 10}
-              </div>
-              <div>
-                <strong>Elective</strong> &nbsp;&nbsp; 
-                Earned: {transcriptData.creditSummary[6]?.earned || 60} &nbsp;&nbsp; 
-                Required: {transcriptData.creditSummary[6]?.required || 70}
-              </div>
+              {/* Left Block - Only show actual courses */}
+              {displayedCreditSummary.slice(0, Math.ceil(displayedCreditSummary.length / 2)).map((credit, index) => (
+                <div key={index} style={{ marginBottom: '5px' }}>
+                  <strong>{credit.subject}</strong> &nbsp;&nbsp; 
+                  Earned: {credit.earned || 0} &nbsp;&nbsp; 
+                  Required: {credit.required || 0}
+                </div>
+              ))}
+              {/* Fill with default subjects if less than expected */}
+              {displayedCreditSummary.length < 8 && (
+                <>
+                  {!displayedCreditSummary.find(c => c.subject === 'History/Social Science') && (
+                    <div style={{ marginBottom: '5px' }}>
+                      <strong>History/Social Science</strong> &nbsp;&nbsp; 
+                      Earned: 25 &nbsp;&nbsp; 
+                      Required: 30
+                    </div>
+                  )}
+                  {!displayedCreditSummary.find(c => c.subject === 'English') && (
+                    <div style={{ marginBottom: '5px' }}>
+                      <strong>English</strong> &nbsp;&nbsp; 
+                      Earned: 25 &nbsp;&nbsp; 
+                      Required: 40
+                    </div>
+                  )}
+                  {!displayedCreditSummary.find(c => c.subject === 'Foreign Language') && (
+                    <div style={{ marginBottom: '5px' }}>
+                      <strong>Foreign Language</strong> &nbsp;&nbsp; 
+                      Earned: 10 &nbsp;&nbsp; 
+                      Required: 20
+                    </div>
+                  )}
+                  {!displayedCreditSummary.find(c => c.subject === 'Physical Education') && (
+                    <div>
+                      <strong>Physical Education</strong> &nbsp;&nbsp; 
+                      Earned: 20 &nbsp;&nbsp; 
+                      Required: 10
+                    </div>
+                  )}
+                </>
+              )}
             </td>
             <td style={{ 
               border: '1px solid #000', 
@@ -416,27 +492,47 @@ const TranscriptPreview = () => {
               fontSize: '9px',
               verticalAlign: 'top'
             }}>
-              <div style={{ marginBottom: '5px' }}>
-                <strong>Mathematics</strong> &nbsp;&nbsp; 
-                Earned: {transcriptData.creditSummary[2]?.earned || 45} &nbsp;&nbsp; 
-                Required: {transcriptData.creditSummary[2]?.required || 40}
-              </div>
-              <div style={{ marginBottom: '5px' }}>
-                <strong>Laboratory Science</strong> &nbsp;&nbsp; 
-                Earned: {transcriptData.creditSummary[3]?.earned || 35} &nbsp;&nbsp; 
-                Required: {transcriptData.creditSummary[3]?.required || 30}
-              </div>
-              <div style={{ marginBottom: '5px' }}>
-                <strong>Arts</strong> &nbsp;&nbsp; 
-                Earned: {transcriptData.creditSummary[5]?.earned || 10} &nbsp;&nbsp; 
-                Required: {transcriptData.creditSummary[5]?.required || 20}
-              </div>
-              <div style={{ marginBottom: '5px', color: '#666' }}>
-                [Additional Subject]
-              </div>
-              <div style={{ color: '#666' }}>
-                [Additional Subject]
-              </div>
+              {/* Right Block - Only show actual courses */}
+              {displayedCreditSummary.slice(Math.ceil(displayedCreditSummary.length / 2)).map((credit, index) => (
+                <div key={index} style={{ marginBottom: '5px' }}>
+                  <strong>{credit.subject}</strong> &nbsp;&nbsp; 
+                  Earned: {credit.earned || 0} &nbsp;&nbsp; 
+                  Required: {credit.required || 0}
+                </div>
+              ))}
+              {/* Fill with default subjects if less than expected */}
+              {displayedCreditSummary.length < 8 && (
+                <>
+                  {!displayedCreditSummary.find(c => c.subject === 'Mathematics') && (
+                    <div style={{ marginBottom: '5px' }}>
+                      <strong>Mathematics</strong> &nbsp;&nbsp; 
+                      Earned: 45 &nbsp;&nbsp; 
+                      Required: 40
+                    </div>
+                  )}
+                  {!displayedCreditSummary.find(c => c.subject === 'Laboratory Science') && (
+                    <div style={{ marginBottom: '5px' }}>
+                      <strong>Laboratory Science</strong> &nbsp;&nbsp; 
+                      Earned: 35 &nbsp;&nbsp; 
+                      Required: 30
+                    </div>
+                  )}
+                  {!displayedCreditSummary.find(c => c.subject === 'Arts') && (
+                    <div style={{ marginBottom: '5px' }}>
+                      <strong>Arts</strong> &nbsp;&nbsp; 
+                      Earned: 10 &nbsp;&nbsp; 
+                      Required: 20
+                    </div>
+                  )}
+                  {!displayedCreditSummary.find(c => c.subject === 'Elective') && (
+                    <div>
+                      <strong>Elective</strong> &nbsp;&nbsp; 
+                      Earned: 60 &nbsp;&nbsp; 
+                      Required: 70
+                    </div>
+                  )}
+                </>
+              )}
             </td>
           </tr>
         </tbody>
