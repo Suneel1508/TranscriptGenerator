@@ -45,7 +45,7 @@ const TranscriptPreview = () => {
 
   // Filter out empty credit summary entries for PDF display
   const getDisplayedCreditSummary = () => {
-    return transcriptData.creditSummary.filter(credit => 
+    return (transcriptData.creditSummary || []).filter(credit => 
       credit.subject && credit.subject.trim() !== ''
     )
   }

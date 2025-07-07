@@ -49,6 +49,10 @@ const TranscriptProvider = ({ children }) => {
     // Courses
     courses: [],
     
+    // Credit Summary and Transfer
+    creditSummary: [],
+    creditTransfer: [],
+    
     // Files (removed photo)
     digitalStamp: null,
     signature: null
@@ -216,6 +220,8 @@ const TranscriptProvider = ({ children }) => {
       dateSigned: '',
       comments: '',
       courses: [],
+      creditSummary: [],
+      creditTransfer: [],
       digitalStamp: null,
       signature: null
     })
