@@ -45,7 +45,141 @@ const TranscriptPreview = () => {
 
   // Filter out empty credit summary entries for PDF display
   const getDisplayedCreditSummary = () => {
-    return (transcriptData.creditSummary || []).filter(credit => 
+    const creditSummary = transcriptData.creditSummary || [];
+    return creditSummary.filter(credit => 
+      credit && credit.subject && credit.subject.trim() !== ''
+    )
+  }
+
+  const displayedCreditSummary = getDisplayedCreditSummary()
+
+  // Get credit transfer data for display
+  const getDisplayedCreditTransfer = () => {
+    const creditTransfer = transcriptData.creditTransfer || [];
+    return creditTransfer.filter(transfer => 
+      transfer && transfer.school && transfer.school.trim() !== ''
+    )
+  }
+
+  const displayedCreditTransfer = getDisplayedCreditTransfer()
+
+  // Generate enrollment summary based on courses
+  const generateEnrollmentSummary = () => {
+    const enrollmentMap = {};
+    
+    transcriptData.courses.forEach(course => {
+      if (!course.school || !course.gradeLevel || !course.schoolYear) return;
+      
+      const key = `${course.gradeLevel}-${course.schoolYear}-${course.school}`;
+      if (!enrollmentMap[key]) {
+        enrollmentMap[key] = {
+          startEndDate: `${course.schoolYear}`,
+          grade: course.gradeLevel,
+          school: course.school
+        };
+      }
+    });
+    
+    return Object.values(enrollmentMap).sort((a, b) => {
+      // Sort by grade level first, then by school
+      if (a.grade !== b.grade) return a.grade - b.grade;
+      return a.school.localeCompare(b.school);
+    });
+  }
+  
+  // Generate credit transfer summary based on courses
+  const generateCreditTransfer = () => {
+    const transferMap = {};
+    
+    transcriptData.courses.forEach(course => {
+      if (!course.school || !course.credits || course.grade === 'IP') return;
+      
+      if (!transferMap[course.school]) {
+        transferMap[course.school] = {
+          school: course.school,
+          credits: 0
+        };
+      }
+      
+      transferMap[course.school].credits += parseFloat(course.credits) || 0;
+    });
+    
+    return Object.values(transferMap);
+  }
+  
+  // Generate credit summary by subject
+  const generateCreditSummary = () => {
+    // Define subject categories and their keywords
+    const subjectCategories = {
+      'History/Social Science': ['history', 'world', 'us', 'government', 'economics', 'social', 'civics', 'geography', 'psychology', 'sociology', 'political'],
+      'English': ['english', 'literature', 'writing', 'language', 'reading', 'composition', 'poetry', 'creative'],
+      'Mathematics': ['math', 'calculus', 'statistics', 'algebra', 'geometry', 'trigonometry', 'pre-calculus', 'discrete'],
+      'Laboratory Science': ['biology', 'chemistry', 'physics', 'environmental', 'anatomy', 'physiology', 'earth', 'astronomy', 'science'],
+      'Foreign Language': ['spanish', 'french', 'german', 'chinese', 'japanese', 'latin', 'italian', 'portuguese', 'arabic', 'language'],
+      'Arts': ['art', 'music', 'drama', 'theatre', 'dance', 'painting', 'drawing', 'band', 'orchestra', 'choir'],
+      'Physical Education': ['pe', 'physical', 'health', 'fitness', 'sports', 'athletics'],
+      'Career/Technical': ['computer', 'programming', 'business', 'accounting', 'marketing', 'engineering', 'technology'],
+      'Elective': []
+    };
+    
+    // Initialize credit summary
+    const creditSummary = Object.keys(subjectCategories).map(subject => ({
+      subject,
+      earned: 0,
+      required: subject === 'Mathematics' || subject === 'English' ? 40 : 
+               subject === 'Laboratory Science' || subject === 'History/Social Science' ? 30 :
+               subject === 'Foreign Language' || subject === 'Arts' ? 20 :
+               subject === 'Physical Education' ? 10 : 70 // Electives and others
+    }));
+    
+    // Calculate earned credits by subject
+    transcriptData.courses.forEach(course => {
+      if (!course.courseTitle || !course.credits || course.grade === 'IP') return;
+      
+      const courseTitle = course.courseTitle.toLowerCase();
+      const credits = parseFloat(course.credits) || 0;
+      
+      // Find matching subject category
+      let matched = false;
+      for (const [subject, keywords] of Object.entries(subjectCategories)) {
+        if (subject === 'Elective') continue; // Skip elective for now
+        
+        if (keywords.some(keyword => courseTitle.includes(keyword.toLowerCase()))) {
+          // Find and update the subject in creditSummary
+          const summaryItem = creditSummary.find(item => item.subject === subject);
+          if (summaryItem) {
+            summaryItem.earned += credits;
+            matched = true;
+            break;
+          }
+        }
+      }
+      
+      // If no match found, add to Electives
+      if (!matched && credits > 0) {
+        const electiveItem = creditSummary.find(item => item.subject === 'Elective');
+        if (electiveItem) {
+          electiveItem.earned += credits;
+        }
+      }
+    });
+    
+    return creditSummary;
+  }
+  
+  // Use generated data if none exists
+  const enrollmentSummary = transcriptData.courses.length > 0 ? generateEnrollmentSummary() : [];
+  const creditTransfer = displayedCreditTransfer.length > 0 ? displayedCreditTransfer : generateCreditTransfer();
+  const creditSummary = displayedCreditSummary.length > 0 ? displayedCreditSummary : generateCreditSummary();
+  
+  // Calculate total credits
+  const calculateTotalCredits = () => {
+    return transcriptData.courses
+      .filter(course => course.grade !== 'IP' && course.credits)
+      .reduce((sum, course) => sum + (parseFloat(course.credits) || 0), 0);
+  }
+  
+  const totalCredits = calculateTotalCredits();
       credit.subject && credit.subject.trim() !== ''
     )
   }
@@ -90,6 +224,7 @@ const TranscriptPreview = () => {
         {transcriptData.institutionName || 'LEGEND COLLEGE PREPARATORY'} TRANSCRIPT
       </div>
 
+
       {/* Institution Info - ALL ON ONE LINE */}
       <div style={{ 
         textAlign: 'center', 
@@ -131,6 +266,278 @@ const TranscriptPreview = () => {
           <span style={{ width: '30%', fontSize: '10px' }}>{formatSSNForDisplay(transcriptData.ssn)}</span>
         </div>
       </div>
+
+      {/* CONNECTED BLOCKS LAYOUT - ONE COHESIVE TABLE */}
+      <table style={{ 
+        width: '100%', 
+        borderCollapse: 'collapse', 
+        marginBottom: '20px',
+        border: '2px solid #000'
+      }}>
+        <tbody>
+          {/* TOP ROW: GPA Summary | Total Credit Completed */}
+          <tr>
+            <td style={{ 
+              border: '1px solid #000',
+              padding: '8px', 
+              backgroundColor: '#f0f0f0', 
+              fontWeight: 'bold',
+              fontSize: '10px',
+              width: '50%'
+            }}>
+              GPA Summary
+            </td>
+            <td style={{ 
+              border: '1px solid #000',
+              padding: '8px', 
+              backgroundColor: '#f0f0f0', 
+              fontWeight: 'bold',
+              fontSize: '10px',
+              width: '50%'
+            }}>
+              Total Credit Completed
+            </td>
+          </tr>
+          <tr>
+            <td style={{ 
+              border: '1px solid #000',
+              padding: '8px',
+              fontSize: '10px',
+              verticalAlign: 'top'
+            }}>
+              Cumulative GPA (Weighted): {transcriptData.cumulativeGPA || '4.33'}
+            </td>
+            <td style={{ 
+              border: '1px solid #000',
+              padding: '8px',
+              fontSize: '10px',
+              verticalAlign: 'top'
+            }}>
+              {totalCredits || transcriptData.totalCredits || '20'} {transcriptData.institutionName || 'Legend College Preparatory'}
+            </td>
+          </tr>
+
+          {/* MIDDLE ROW: Enrollment Summary | Total Credit Transferred */}
+          <tr>
+            <td style={{ 
+              border: '1px solid #000',
+              padding: '8px', 
+              backgroundColor: '#f0f0f0', 
+              fontWeight: 'bold',
+              fontSize: '10px'
+            }}>
+              Enrollment Summary
+            </td>
+            <td style={{ 
+              border: '1px solid #000',
+              padding: '8px', 
+              backgroundColor: '#f0f0f0', 
+              fontWeight: 'bold',
+              fontSize: '10px'
+            }}>
+              Total Credit Transferred
+            </td>
+          </tr>
+          <tr>
+            <td style={{ 
+              border: '1px solid #000',
+              padding: '8px',
+              fontSize: '9px',
+              verticalAlign: 'top'
+            }}>
+              {/* ✅ ENROLLMENT SUMMARY CONTENT - ABSOLUTELY NO INTERNAL BORDERS */}
+              <div style={{ width: '100%' }}>
+                {/* Column Headers - NO BORDERS */}
+                <div style={{ 
+                  display: 'flex', 
+                  fontWeight: 'bold',
+                  marginBottom: '8px',
+                  paddingBottom: '4px',
+                  borderBottom: '1px solid #ccc'
+                }}>
+                  <div style={{ width: '35%', padding: '2px' }}>Start/End Date</div>
+                  <div style={{ width: '20%', padding: '2px' }}>Grade</div>
+                  <div style={{ width: '45%', padding: '2px' }}>School</div>
+                </div>
+                
+                {/* Data Rows - NO BORDERS */}
+                {enrollmentSummary.length > 0 ? (
+                  enrollmentSummary.map((enrollment, index) => (
+                    <div key={index} style={{ 
+                      display: 'flex',
+                      marginBottom: '4px'
+                    }}>
+                      <div style={{ width: '35%', padding: '2px' }}>
+                        {enrollment.startEndDate}
+                      </div>
+                      <div style={{ width: '20%', padding: '2px' }}>
+                        {enrollment.grade}
+                      </div>
+                      <div style={{ width: '45%', padding: '2px' }}>
+                        {enrollment.school}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  // Default entries if none are added
+                  <>
+                    <div style={{ display: 'flex', marginBottom: '4px' }}>
+                      <div style={{ width: '35%', padding: '2px' }}>2016-2017</div>
+                      <div style={{ width: '20%', padding: '2px' }}>9</div>
+                      <div style={{ width: '45%', padding: '2px' }}>Leigh High School</div>
+                    </div>
+                    <div style={{ display: 'flex', marginBottom: '4px' }}>
+                      <div style={{ width: '35%', padding: '2px' }}>2017-2018</div>
+                      <div style={{ width: '20%', padding: '2px' }}>10</div>
+                      <div style={{ width: '45%', padding: '2px' }}>Leigh High School</div>
+                    </div>
+                    <div style={{ display: 'flex', marginBottom: '4px' }}>
+                      <div style={{ width: '35%', padding: '2px' }}>2018-2019</div>
+                      <div style={{ width: '20%', padding: '2px' }}>11</div>
+                      <div style={{ width: '45%', padding: '2px' }}>Legend College Preparatory</div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </td>
+            <td style={{ 
+              border: '1px solid #000',
+              padding: '8px',
+              fontSize: '9px',
+              verticalAlign: 'top',
+              textAlign: 'center' // ✅ CENTERED CONTENT
+            }}>
+              {/* ✅ CREDIT TRANSFER CONTENT - CENTERED */}
+              <div style={{ width: '100%' }}>
+                {creditTransfer.length > 0 ? (
+                  creditTransfer.map((transfer, index) => (
+                    <div key={index} style={{ marginBottom: '5px' }}>
+                      {transfer.credits} {transfer.school}
+                    </div>
+                  ))
+                ) : (
+                  // Default entries if none are added
+                  <>
+                    <div style={{ marginBottom: '5px' }}>150 Leigh High School</div>
+                    <div style={{ marginBottom: '5px' }}>30 Foothill College</div>
+                    <div style={{ marginBottom: '5px' }}>10 De Anza College</div>
+                  </>
+                )}
+              </div>
+            </td>
+          </tr>
+
+          {/* BOTTOM ROW: Credit Summary (Full Width) */}
+          <tr>
+            <td style={{ 
+              border: '1px solid #000',
+              padding: '8px', 
+              backgroundColor: '#f0f0f0', 
+              fontWeight: 'bold',
+              textAlign: 'center',
+              fontSize: '10px'
+            }} colSpan="2">
+              Credit Summary<br />
+              Curriculum Track: College Prep, Honors
+            </td>
+          </tr>
+          <tr>
+            <td style={{ 
+              border: '1px solid #000',
+              padding: '8px',
+              fontSize: '9px',
+              verticalAlign: 'top'
+            }} colSpan="2">
+              {/* ✅ CREDIT SUMMARY CONTENT - NO INTERNAL BORDERS EXCEPT CENTER DIVIDER */}
+              <div style={{ display: 'flex' }}>
+                {/* LEFT BLOCK - NO INTERNAL BORDERS */}
+                <div style={{ width: '50%', paddingRight: '10px' }}>
+                  {creditSummary.length > 0 ? (
+                    creditSummary.slice(0, Math.ceil(creditSummary.length / 2)).map((credit, index) => (
+                      <div key={index} style={{ 
+                        marginBottom: '5px', 
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}>
+                        <span style={{ fontWeight: 'bold', width: '50%' }}>{credit.subject}</span>
+                        <span style={{ width: '25%' }}>Earned: {credit.earned || 0}</span>
+                        <span style={{ width: '25%' }}>Required: {credit.required || 0}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 'bold', width: '50%' }}>History/Social Science</span>
+                        <span style={{ width: '25%' }}>Earned: 25</span>
+                        <span style={{ width: '25%' }}>Required: 30</span>
+                      </div>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 'bold', width: '50%' }}>English</span>
+                        <span style={{ width: '25%' }}>Earned: 25</span>
+                        <span style={{ width: '25%' }}>Required: 40</span>
+                      </div>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 'bold', width: '50%' }}>Foreign Language</span>
+                        <span style={{ width: '25%' }}>Earned: 10</span>
+                        <span style={{ width: '25%' }}>Required: 20</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 'bold', width: '50%' }}>Physical Education</span>
+                        <span style={{ width: '25%' }}>Earned: 20</span>
+                        <span style={{ width: '25%' }}>Required: 10</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+                
+                {/* RIGHT BLOCK - NO INTERNAL BORDERS, ONLY LEFT SEPARATOR */}
+                <div style={{ 
+                  width: '50%', 
+                  paddingLeft: '10px', 
+                  borderLeft: '1px solid #000'
+                }}>
+                  {creditSummary.length > 0 ? (
+                    creditSummary.slice(Math.ceil(creditSummary.length / 2)).map((credit, index) => (
+                      <div key={index} style={{ 
+                        marginBottom: '5px', 
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}>
+                        <span style={{ fontWeight: 'bold', width: '50%' }}>{credit.subject}</span>
+                        <span style={{ width: '25%' }}>Earned: {credit.earned || 0}</span>
+                        <span style={{ width: '25%' }}>Required: {credit.required || 0}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 'bold', width: '50%' }}>Mathematics</span>
+                        <span style={{ width: '25%' }}>Earned: 45</span>
+                        <span style={{ width: '25%' }}>Required: 40</span>
+                      </div>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 'bold', width: '50%' }}>Laboratory Science</span>
+                        <span style={{ width: '25%' }}>Earned: 35</span>
+                        <span style={{ width: '25%' }}>Required: 30</span>
+                      </div>
+                      <div style={{ marginBottom: '5px', display: 'flex', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 'bold', width: '50%' }}>Arts</span>
+                        <span style={{ width: '25%' }}>Earned: 10</span>
+                        <span style={{ width: '25%' }}>Required: 20</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 'bold', width: '50%' }}>Elective</span>
+                        <span style={{ width: '25%' }}>Earned: 60</span>
+                        <span style={{ width: '25%' }}>Required: 70</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       {/* CONNECTED BLOCKS LAYOUT - ONE COHESIVE TABLE */}
 
