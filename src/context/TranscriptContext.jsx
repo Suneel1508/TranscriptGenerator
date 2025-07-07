@@ -46,30 +46,6 @@ const TranscriptProvider = ({ children }) => {
     // Comments
     comments: '',
     
-    // Enrollment Summary (Block 1)
-    enrollmentSummary: [
-      { startEndDate: '', grade: '', school: '' },
-      { startEndDate: '', grade: '', school: '' },
-      { startEndDate: '', grade: '', school: '' }
-    ],
-    
-    // Credit Transfer (Block 2) - NEW
-    creditTransfer: [
-      { school: '', credits: 0 }
-    ],
-    
-    // Credit Summary
-    creditSummary: [
-      { subject: 'History/Social Science', earned: 0, required: 0 },
-      { subject: 'English', earned: 0, required: 0 },
-      { subject: 'Mathematics', earned: 0, required: 0 },
-      { subject: 'Laboratory Science', earned: 0, required: 0 },
-      { subject: 'Foreign Language', earned: 0, required: 0 },
-      { subject: 'Arts', earned: 0, required: 0 },
-      { subject: 'Elective', earned: 0, required: 0 },
-      { subject: 'Physical Education', earned: 0, required: 0 }
-    ],
-    
     // Courses
     courses: [],
     
@@ -239,24 +215,6 @@ const TranscriptProvider = ({ children }) => {
       principalName: '',
       dateSigned: '',
       comments: '',
-      enrollmentSummary: [
-        { startEndDate: '', grade: '', school: '' },
-        { startEndDate: '', grade: '', school: '' },
-        { startEndDate: '', grade: '', school: '' }
-      ],
-      creditTransfer: [
-        { school: '', credits: 0 }
-      ],
-      creditSummary: [
-        { subject: 'History/Social Science', earned: 0, required: 0 },
-        { subject: 'English', earned: 0, required: 0 },
-        { subject: 'Mathematics', earned: 0, required: 0 },
-        { subject: 'Laboratory Science', earned: 0, required: 0 },
-        { subject: 'Foreign Language', earned: 0, required: 0 },
-        { subject: 'Arts', earned: 0, required: 0 },
-        { subject: 'Elective', earned: 0, required: 0 },
-        { subject: 'Physical Education', earned: 0, required: 0 }
-      ],
       courses: [],
       digitalStamp: null,
       signature: null
