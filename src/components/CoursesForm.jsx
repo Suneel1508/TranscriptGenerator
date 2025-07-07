@@ -25,7 +25,6 @@ const CoursesForm = () => {
     hap: '',
     grade: '',
     credits: '',
-    school: '',
     semester: '1st'
   })
   const [gpaData, setGpaData] = useState({
@@ -58,7 +57,6 @@ const CoursesForm = () => {
       hap: '',
       grade: '',
       credits: '',
-      school: '',
       semester: '1st'
     })
     setIsAdding(false)
@@ -85,7 +83,7 @@ const CoursesForm = () => {
     const finalCourse = isIPGrade ? { ...courseForm, credits: '' } : courseForm
 
     if (editingCourse) {
-      updateCourse(editingCourse.id, finalCourse)
+      updateCourse(editingCourse.id, finalCourse) 
     } else {
       addCourse(finalCourse)
     }
@@ -231,7 +229,7 @@ const CoursesForm = () => {
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Course Title *
+                  Course Title*
                 </label>
                 <input
                   type="text"
@@ -254,6 +252,20 @@ const CoursesForm = () => {
                   {COURSE_LEVELS.map(level => (
                     <option key={level.value} value={level.value}>{level.label}</option>
                   ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Semester *
+                </label>
+                <select
+                  value={courseForm.semester}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, semester: e.target.value }))}
+                  className="input-field"
+                  required
+                >
+                  <option value="1st">1st Semester</option>
+                  <option value="2nd">2nd Semester</option>
                 </select>
               </div>
               <div>
@@ -294,12 +306,12 @@ const CoursesForm = () => {
               </div>
               <div className="md:col-span-3">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  School Name *
+                  School Name*
                 </label>
                 <input
                   type="text"
-                  value={courseForm.school}
-                  onChange={(e) => setCourseForm(prev => ({ ...prev, school: e.target.value }))}
+                  value={courseForm.school || ''}
+                  onChange={(e) => setCourseForm(prev => ({ ...prev, school: e.target.value.trim() }))}
                   className="input-field"
                   placeholder="e.g., Legend College Preparatory, Leigh High School, etc."
                   required
@@ -369,28 +381,31 @@ const CoursesForm = () => {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Grade Level
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           School Year
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Course Title
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           H/AP
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Semester
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Grade
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Credits
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           School
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Actions
                         </th>
                       </tr>
@@ -427,6 +442,9 @@ const CoursesForm = () => {
                                       {getCourseLevelName(course.hap)}
                                     </td>
                                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                      {course.semester}
+                                    </td>
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                                         ['A+', 'A', 'A-'].includes(course.grade) ? 'bg-green-100 text-green-800' :
                                         ['B+', 'B', 'B-'].includes(course.grade) ? 'bg-blue-100 text-blue-800' :
@@ -441,7 +459,7 @@ const CoursesForm = () => {
                                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                       {course.grade === 'IP' ? '' : course.credits}
                                     </td>
-                                    <td className="px-4 py-4 text-sm text-gray-900">
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                                       {course.school}
                                     </td>
                                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">

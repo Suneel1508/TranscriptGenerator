@@ -51,14 +51,7 @@ export const COURSE_LEVELS = [
 
 // Updated school options
 export const SCHOOL_OPTIONS = [
-  'Dublin High School',
-  'Happy Academy', 
-  'Fallon Middle School',
-  'Las Positas College',
-  'Legend College Preparatory',
-  'Leigh High School',
-  'Foothill College',
-  'De Anza College'
+  // School options removed as we now allow manual entry
 ]
 
 /**
