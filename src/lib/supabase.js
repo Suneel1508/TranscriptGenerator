@@ -4,13 +4,22 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables. Please check your .env file.')
+  console.error('Missing Supabase environment variables. Please check your .env file.')
+  console.log('VITE_SUPABASE_URL:', supabaseUrl ? 'Set' : 'Missing')
+  console.log('VITE_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Set' : 'Missing')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null
 
 // Admin authentication functions
 export const authenticateAdmin = async (email, password) => {
+  if (!supabase) {
+    console.error('Supabase client not initialized')
+    return { success: false, error: 'Database connection not available' }
+  }
+  
   try {
     const { data, error } = await supabase.rpc('authenticate_admin', {
       p_email: email,
@@ -34,6 +43,10 @@ export const authenticateAdmin = async (email, password) => {
 }
 
 export const createAdminUser = async (email, password, name) => {
+  if (!supabase) {
+    return { success: false, error: 'Database connection not available' }
+  }
+  
   try {
     const { data, error } = await supabase.rpc('create_admin_user', {
       user_email: email,
@@ -66,6 +79,10 @@ export const logoutAdmin = () => {
 
 // Transcript functions
 export const saveTranscript = async (transcriptData, name) => {
+  if (!supabase) {
+    return { success: false, error: 'Database connection not available' }
+  }
+  
   try {
     const currentAdmin = getCurrentAdmin()
     if (!currentAdmin) {
@@ -94,6 +111,10 @@ export const saveTranscript = async (transcriptData, name) => {
 }
 
 export const getTranscripts = async () => {
+  if (!supabase) {
+    return { success: false, error: 'Database connection not available' }
+  }
+  
   try {
     const { data, error } = await supabase
       .from('transcripts')
@@ -113,6 +134,10 @@ export const getTranscripts = async () => {
 }
 
 export const updateTranscript = async (id, transcriptData, name) => {
+  if (!supabase) {
+    return { success: false, error: 'Database connection not available' }
+  }
+  
   try {
     const { data, error } = await supabase
       .from('transcripts')
@@ -136,6 +161,10 @@ export const updateTranscript = async (id, transcriptData, name) => {
 }
 
 export const deleteTranscript = async (id) => {
+  if (!supabase) {
+    return { success: false, error: 'Database connection not available' }
+  }
+  
   try {
     const { error } = await supabase
       .from('transcripts')
@@ -152,6 +181,10 @@ export const deleteTranscript = async (id) => {
 }
 
 export const getTranscriptsBySSN = async (ssn) => {
+  if (!supabase) {
+    return { success: false, error: 'Database connection not available' }
+  }
+  
   try {
     const { data, error } = await supabase
       .from('transcripts')
